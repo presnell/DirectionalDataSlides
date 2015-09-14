@@ -1,0 +1,944 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2015-09-14 Mon 17:43 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="viewport" content="width=device-width, initial-scale=1" />
+<title>Analysis of Directional Data</title>
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Brett Presnell" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Analysis of Directional Data</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgheadline12">1. Introduction</a>
+<ul>
+<li><a href="#orgheadline1">Examples</a></li>
+<li><a href="#orgheadline2">Wind Directions</a></li>
+<li><a href="#orgheadline5">Arrival Times at an ICU</a></li>
+<li><a href="#orgheadline8">Primate Vertebrae</a></li>
+<li><a href="#orgheadline9">Plot of Human Data</a></li>
+<li><a href="#orgheadline10">Butterfly Migrations</a></li>
+<li><a href="#orgheadline11">Why is the Analysis of Directional Data Different?</a></li>
+</ul>
+</li>
+<li><a href="#orgheadline29">2. Graphical Display of Directional Data</a>
+<ul>
+<li><a href="#orgheadline13">Graphical Display of Circular Data (in R)</a></li>
+<li><a href="#orgheadline14">Graphical Display of Circular Data (in R) (ctd)</a></li>
+<li><a href="#orgheadline15">Graphical Display of Circular Data (in R) (ctd)</a></li>
+<li><a href="#orgheadline16">Graphical Display of Circular Data (in R) (ctd)</a></li>
+<li><a href="#orgheadline17">Circular Histograms</a></li>
+<li><a href="#orgheadline18">Rose Diagrams</a></li>
+<li><a href="#orgheadline19">Adding a Rose Diagram to the Plot of Wind Directions</a></li>
+<li><a href="#orgheadline20">Adding a Rose Diagram to the Plot of Wind Directions</a></li>
+<li><a href="#orgheadline23">Changing the Binwidth</a></li>
+<li><a href="#orgheadline24">Changing the Radii</a></li>
+<li><a href="#orgheadline25">Changing the Radii</a></li>
+<li><a href="#orgheadline26">Kernel Density Estimates</a></li>
+<li><a href="#orgheadline27">Kernel Density Estimates</a></li>
+<li><a href="#orgheadline28">Spherical Data</a></li>
+</ul>
+</li>
+<li><a href="#orgheadline32">3. Basic Summary Statistics</a>
+<ul>
+<li><a href="#orgheadline30">Mean Direction and Mean Resultant Length</a></li>
+<li><a href="#orgheadline31">Plot</a></li>
+</ul>
+</li>
+<li><a href="#orgheadline35">4. Aside: Generating from the Uniform Distribution on the Sphere</a>
+<ul>
+<li><a href="#orgheadline33">Generating Random Points on the Sphere</a></li>
+<li><a href="#orgheadline34">Code for Timing Results</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline12" class="outline-2">
+<h2 id="orgheadline12"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-orgheadline1" class="outline-3">
+<h3 id="orgheadline1">Examples</h3>
+<div class="outline-text-3" id="text-orgheadline1">
+<p>
+Wish to analyze data in which response is a &ldquo;direction&rdquo;:
+</p>
+
+<ul class="org-ul">
+<li>2d directional data are called <i>circular</i> data</li>
+<li>3d directional data are called <i>spherical</i> data</li>
+<li>not all &ldquo;directional&rdquo; data are directions in the usual sense</li>
+<li>&ldquo;directional&rdquo; data may also arise in higher dimensions</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgheadline2" class="outline-3">
+<h3 id="orgheadline2">Wind Directions</h3>
+<div class="outline-text-3" id="text-orgheadline2">
+<ul class="org-ul">
+<li>Recorded at  Col de la Roa, Italian Alps</li>
+<li>n = 310 (first 40 listed below)</li>
+<li>Radians, clockwise from north</li>
+<li>Source: Agostinelli (CSDA 2007); also R package <code>circular</code></li>
+</ul>
+</div>
+
+<ul class="org-ul"><li><a id="orgheadline3"></a>Data<br  /><div class="outline-text-4" id="text-orgheadline3">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<tbody>
+<tr>
+<td>6.23</td>
+<td>1.03</td>
+<td>0.15</td>
+<td>0.72</td>
+<td>2.20</td>
+</tr>
+
+<tr>
+<td>0.46</td>
+<td>0.63</td>
+<td>1.45</td>
+<td>0.37</td>
+<td>1.95</td>
+</tr>
+
+<tr>
+<td>0.08</td>
+<td>0.15</td>
+<td>0.33</td>
+<td>0.09</td>
+<td>0.09</td>
+</tr>
+
+<tr>
+<td>6.23</td>
+<td>0.05</td>
+<td>6.14</td>
+<td>6.28</td>
+<td>6.17</td>
+</tr>
+
+<tr>
+<td>6.24</td>
+<td>6.02</td>
+<td>6.14</td>
+<td>6.25</td>
+<td>0.01</td>
+</tr>
+
+<tr>
+<td>5.38</td>
+<td>5.30</td>
+<td>5.63</td>
+<td>0.77</td>
+<td>1.34</td>
+</tr>
+
+<tr>
+<td>6.14</td>
+<td>0.22</td>
+<td>6.23</td>
+<td>2.33</td>
+<td>3.61</td>
+</tr>
+
+<tr>
+<td>0.49</td>
+<td>6.12</td>
+<td>0.01</td>
+<td>0.00</td>
+<td>0.46</td>
+</tr>
+</tbody>
+</table>
+</div></li>
+
+<li><a id="orgheadline4"></a>Plot<br  /><div class="outline-text-4" id="text-orgheadline4">
+
+<div class="figure">
+<p><img src="Plots/wind.png" alt="wind.png" />
+</p>
+</div>
+</div></li></ul>
+</div>
+
+<div id="outline-container-orgheadline5" class="outline-3">
+<h3 id="orgheadline5">Arrival Times at an ICU</h3>
+<div class="outline-text-3" id="text-orgheadline5">
+<ul class="org-ul">
+<li>24-hour clock times (format <code>hrs.mins</code>)</li>
+<li>n = 254 (first 32 listed below)</li>
+<li>Source: Cox &amp; Lewis (1966); also Fisher (1993) and R package
+<code>circular</code></li>
+</ul>
+</div>
+
+<ul class="org-ul"><li><a id="orgheadline6"></a>Data<br  /><div class="outline-text-4" id="text-orgheadline6">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<tbody>
+<tr>
+<td>11.00</td>
+<td>17.00</td>
+<td>23.15</td>
+<td>10.00</td>
+</tr>
+
+<tr>
+<td>12.00</td>
+<td>8.45</td>
+<td>16.00</td>
+<td>10.00</td>
+</tr>
+
+<tr>
+<td>15.30</td>
+<td>20.20</td>
+<td>4.00</td>
+<td>12.00</td>
+</tr>
+
+<tr>
+<td>2.20</td>
+<td>12.00</td>
+<td>5.30</td>
+<td>7.30</td>
+</tr>
+
+<tr>
+<td>12.00</td>
+<td>16.00</td>
+<td>16.00</td>
+<td>1.30</td>
+</tr>
+
+<tr>
+<td>11.05</td>
+<td>16.00</td>
+<td>19.00</td>
+<td>17.45</td>
+</tr>
+
+<tr>
+<td>20.20</td>
+<td>21.00</td>
+<td>12.00</td>
+<td>12.00</td>
+</tr>
+
+<tr>
+<td>18.00</td>
+<td>22.00</td>
+<td>22.00</td>
+<td>22.05</td>
+</tr>
+</tbody>
+</table>
+</div></li>
+
+<li><a id="orgheadline7"></a>Plot<br  /><div class="outline-text-4" id="text-orgheadline7">
+
+<div class="figure">
+<p><img src="Plots/icu.png" alt="icu.png" />
+</p>
+</div>
+</div></li></ul>
+</div>
+
+<div id="outline-container-orgheadline8" class="outline-3">
+<h3 id="orgheadline8">Primate Vertebrae</h3>
+<div class="outline-text-3" id="text-orgheadline8">
+<ul class="org-ul">
+<li>Orientation of left superior facet of last lumbar vertebra in
+humans, gorillas, and chimpanzees</li>
+<li>Source: Keifer (2005 UF Anthropology MA Thesis)</li>
+</ul>
+
+
+<div class="figure">
+<p><img src="Pictures/Gray93.png" alt="Gray93.png" />
+</p>
+<p><span class="figure-number">Figure 3:</span> Human lumbar vertebra with right superior facet labelled as superior articulate process.</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline9" class="outline-3">
+<h3 id="orgheadline9">Plot of Human Data</h3>
+<div class="outline-text-3" id="text-orgheadline9">
+
+<div class="figure">
+<p><img src="Pictures/vertebraeOnSphere.png" alt="vertebraeOnSphere.png" />
+</p>
+<p><span class="figure-number">Figure 4:</span> Orientation of left superior facets for samples of 18 chimpanzees (red), 16 gorillas (green) and 19 humans (blue).</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline10" class="outline-3">
+<h3 id="orgheadline10">Butterfly Migrations</h3>
+<div class="outline-text-3" id="text-orgheadline10">
+<ul class="org-ul">
+<li>Direction of travel observed for 2649 migrating butterflies in
+Florida</li>
+<li>Source: Thomas J Walker, University of Florida, Dept of Entomology
+and Nematology</li>
+<li>Other variables:
+<ul class="org-ul">
+<li>site: 23 locations in Florida</li>
+<li>observer: Thomas Walker (tw) or James J. Whitesell (jw)</li>
+<li>species: cloudless sulphur (cs), gulf fritillary (gf),
+long-tailed skipper (lt)</li>
+<li>distance to coast (km)</li>
+<li>date and time of observation</li>
+<li>percentage of sky free of clouds</li>
+<li>quality of sunlight: (b)right, (h)aze, (o)bstructed, (p)artly
+obstructed</li>
+<li>presence/absence and direction (N, NE, E, SE, S, SW, W, NW) of wind</li>
+<li>temperature</li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgheadline11" class="outline-3">
+<h3 id="orgheadline11">Why is the Analysis of Directional Data Different?</h3>
+<div class="outline-text-3" id="text-orgheadline11">
+<ul class="org-ul">
+<li>First three observations from the wind directions data:
+<code>6.23, 1.03, 0.15</code></li>
+<li>The mean of these three numbers is
+<code>2.47</code></li>
+<li>What do you think?</li>
+</ul>
+
+
+<div class="figure">
+<p><img src="Plots/meanAngle.png" alt="meanAngle.png" />
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline29" class="outline-2">
+<h2 id="orgheadline29"><span class="section-number-2">2</span> Graphical Display of Directional Data</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-orgheadline13" class="outline-3">
+<h3 id="orgheadline13">Graphical Display of Circular Data (in R)</h3>
+<div class="outline-text-3" id="text-orgheadline13">
+<ul class="org-ul">
+<li>Have already seen simple dot plots for circular data, e.g., for
+the wind data:</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-R">windc <span style="color: #008b8b;">&lt;-</span> circular(wind, type=<span style="color: #8b2252;">"angles"</span>, units=<span style="color: #8b2252;">"radians"</span>,
+                  template=<span style="color: #8b2252;">"geographics"</span>)
+<span style="color: #008b8b;">require</span>(<span style="color: #8b2252;">"circular"</span>)
+par(mar=c(0,0,0,0)+0.1, oma=c(0,0,0,0)+0.1)
+plot(windc, cex=1.5, axes=<span style="color: #228b22;">FALSE</span>,
+     bin=360, stack=<span style="color: #228b22;">TRUE</span>, sep=0.035, shrink=1.3)
+axis.circular(at=circular(seq(0, (7/4)*pi, pi/4),
+                  template=<span style="color: #8b2252;">"geographics"</span>),
+              labels=c(<span style="color: #8b2252;">"N"</span>,<span style="color: #8b2252;">"NE"</span>,<span style="color: #8b2252;">"E"</span>,<span style="color: #8b2252;">"SE"</span>,<span style="color: #8b2252;">"S"</span>,<span style="color: #8b2252;">"SW"</span>,<span style="color: #8b2252;">"W"</span>,<span style="color: #8b2252;">"NW"</span>),
+              cex=1.4)
+ticks.circular(circular(seq(0, (15/8)*pi, pi/8)),
+               zero=pi/2, rotation=<span style="color: #8b2252;">"clock"</span>,
+               tcl=0.075)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline14" class="outline-3">
+<h3 id="orgheadline14">Graphical Display of Circular Data (in R) (ctd)</h3>
+<div class="outline-text-3" id="text-orgheadline14">
+<ul class="org-ul">
+<li>and for the ICU data:</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-R"><span style="color: #b22222;">## </span><span style="color: #b22222;">Note that pch=17 does not work properly here.</span>
+par(mar=c(0,0,0,0)+0.1, oma=c(0,0,0,0)+0.1)
+plot(fisherB1c, cex=1.5, axes=<span style="color: #228b22;">TRUE</span>,
+     bin=360, stack=<span style="color: #228b22;">TRUE</span>, sep=0.035, shrink=1.3)
+</pre>
+</div>
+
+<ul class="org-ul">
+<li>and one more &#x2026;</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgheadline15" class="outline-3">
+<h3 id="orgheadline15">Graphical Display of Circular Data (in R) (ctd)</h3>
+<div class="outline-text-3" id="text-orgheadline15">
+
+<div class="figure">
+<p><img src="Plots/ants.png" alt="ants.png" />
+</p>
+<p><span class="figure-number">Figure 6:</span> Walking directions of long-legged desert ants under three different experimental conditions:</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline16" class="outline-3">
+<h3 id="orgheadline16">Graphical Display of Circular Data (in R) (ctd)</h3>
+<div class="outline-text-3" id="text-orgheadline16">
+<div class="org-src-container">
+
+<pre class="src src-R">par(mar=c(0,0,0,0)+0.1, oma=c(0,0,0,0)+0.1)
+plot(fisherB10c$set1, units=<span style="color: #8b2252;">"degrees"</span>, zero=pi/2,
+     rotation=<span style="color: #8b2252;">"clock"</span>, pch=16, cex=1.5)
+ticks.circular(circular(seq(0, (11/6)*pi, pi/6)),
+               zero=pi/2, rotation=<span style="color: #8b2252;">"clock"</span>, tcl=0.075)
+points(fisherB10c$set2, zero=pi/2,
+       rotation=<span style="color: #8b2252;">"clock"</span>, pch=16, col=<span style="color: #8b2252;">"darkgrey"</span>,
+       next.points=-0.1, cex=1.5)
+points(fisherB10c$set3, zero=pi/2,
+       rotation=<span style="color: #8b2252;">"clock"</span>, pch=1,
+       next.points=0.1, cex=1.5)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline17" class="outline-3">
+<h3 id="orgheadline17">Circular Histograms</h3>
+<div class="outline-text-3" id="text-orgheadline17">
+<ul class="org-ul">
+<li><a href="https://www.google.com/search?q=R+circular+histogram">Circular histograms</a> exist (see Fisher and Mardia and Jupp) but is
+there a ready-made function in R?</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgheadline18" class="outline-3">
+<h3 id="orgheadline18">Rose Diagrams</h3>
+<div class="outline-text-3" id="text-orgheadline18">
+<ul class="org-ul">
+<li>Invented by <a href="https://en.wikipedia.org/wiki/Florence_Nightingale">Florence Nightingale</a> (elected first female member of
+the Royals Statistical Society in 1859; honorary member of ASA)</li>
+<li><a href="https://github.com/jennybc/r-graph-catalog/tree/master/figures/fig05-14_nightingale-data">Nightingale's rose in R</a> (see also <a href="http://www.r-bloggers.com/going-beyond-florence-nightingales-data-diagram-did-flo-blow-it-with-wedges/">this post</a> and the <a href="http://shiny.stat.ubc.ca/r-graph-catalog/">R graph catalog</a>)</li>
+<li>Note that radii of segments are proportional to <i>square root</i> of
+the frequencies (counts), so that areas are proportional to
+frequencies.  Is this the right thing to do?</li>
+<li>Rose diagrams suffer from the same problems as histograms.  The
+impression conveyed may depend strongly on:
+<ul class="org-ul">
+<li>the binwidth of the cells</li>
+<li>the choice of starting point for the bins</li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgheadline19" class="outline-3">
+<h3 id="orgheadline19">Adding a Rose Diagram to the Plot of Wind Directions</h3>
+<div class="outline-text-3" id="text-orgheadline19">
+<div class="org-src-container">
+
+<pre class="src src-R" id="orgsrcblock1">rose.diag(windc, bins=16, col=<span style="color: #8b2252;">"darkgrey"</span>,
+          cex=1.5, prop=1.35, add=<span style="color: #228b22;">TRUE</span>)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline20" class="outline-3">
+<h3 id="orgheadline20">Adding a Rose Diagram to the Plot of Wind Directions</h3>
+<div class="outline-text-3" id="text-orgheadline20">
+
+<div class="figure">
+<p><img src="Plots/windRose.png" alt="windRose.png" />
+</p>
+<p><span class="figure-number">Figure 7:</span> Wind direction data with rose diagram with segment areas are proportional to counts (segment radii are proportional to square roots of counts).</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline23" class="outline-3">
+<h3 id="orgheadline23">Changing the Binwidth</h3>
+<div class="outline-text-3" id="text-orgheadline23">
+</div><ul class="org-ul"><li><a id="orgheadline21"></a>Fewer/Wider Bins<br  /><div class="outline-text-4" id="text-orgheadline21">
+
+<div class="figure">
+<p><img src="Plots/windRoseWide.png" alt="windRoseWide.png" />
+</p>
+</div>
+</div></li>
+
+<li><a id="orgheadline22"></a>Narrow Bins<br  /><div class="outline-text-4" id="text-orgheadline22">
+
+<div class="figure">
+<p><img src="Plots/windRoseNarrow.png" alt="windRoseNarrow.png" />
+</p>
+</div>
+</div></li></ul>
+</div>
+
+<div id="outline-container-orgheadline24" class="outline-3">
+<h3 id="orgheadline24">Changing the Radii</h3>
+<div class="outline-text-3" id="text-orgheadline24">
+<ul class="org-ul">
+<li>I think that the default &ldquo;radii proportional to counts&rdquo; is
+generally best, but this is not always obvious.  The scale
+certainly makes a big difference however.</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-R" id="orgsrcblock2">rose.diag(windc, bins=16, col=<span style="color: #8b2252;">"darkgrey"</span>,
+          radii.scale=<span style="color: #8b2252;">"linear"</span>,
+          cex=1.5, prop=2.4, add=<span style="color: #228b22;">TRUE</span>)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline25" class="outline-3">
+<h3 id="orgheadline25">Changing the Radii</h3>
+<div class="outline-text-3" id="text-orgheadline25">
+
+<div class="figure">
+<p><img src="Plots/windRoseLinear.png" alt="windRoseLinear.png" />
+</p>
+<p><span class="figure-number">Figure 10:</span> Wind direction data with rose diagram (segment radii proportional to counts).</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline26" class="outline-3">
+<h3 id="orgheadline26">Kernel Density Estimates</h3>
+<div class="outline-text-3" id="text-orgheadline26">
+<div class="org-src-container">
+
+<pre class="src src-R" id="orgsrcblock3">lines(density.circular(windc, bw=40), lwd=2, lty=1)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline27" class="outline-3">
+<h3 id="orgheadline27">Kernel Density Estimates</h3>
+<div class="outline-text-3" id="text-orgheadline27">
+
+<div class="figure">
+<p><img src="Plots/windKdens.png" alt="windKdens.png" />
+</p>
+<p><span class="figure-number">Figure 11:</span> Wind direction data with rose diagram and kernel density estimate.</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline28" class="outline-3">
+<h3 id="orgheadline28">Spherical Data</h3>
+<div class="outline-text-3" id="text-orgheadline28">
+<ul class="org-ul">
+<li>Are there any canned routines for plotting spherical data in R?</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline32" class="outline-2">
+<h2 id="orgheadline32"><span class="section-number-2">3</span> Basic Summary Statistics</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-orgheadline30" class="outline-3">
+<h3 id="orgheadline30">Mean Direction and Mean Resultant Length</h3>
+<div class="outline-text-3" id="text-orgheadline30">
+<ul class="org-ul">
+<li>First three observations from the wind directions data:</li>
+</ul>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<tbody>
+<tr>
+<td>theta</td>
+<td>x</td>
+<td>y</td>
+</tr>
+
+<tr>
+<td>6.23</td>
+<td>-0.06</td>
+<td>1.00</td>
+</tr>
+
+<tr>
+<td>1.03</td>
+<td>0.86</td>
+<td>0.51</td>
+</tr>
+
+<tr>
+<td>0.15</td>
+<td>0.15</td>
+<td>0.99</td>
+</tr>
+</tbody>
+</table>
+
+
+<ul class="org-ul">
+<li>resultant (sum of direction vectors):
+(<code>0.952</code>,
+<code>2.5</code>)</li>
+
+<li>mean vector: \((\bar{x}, \bar{y}) = \)
+(<code>0.317</code>,
+<code>0.833</code>)</li>
+
+<li>resultant length (Euclidean norm of resultant): R = 
+<code>2.675</code></li>
+
+<li>mean resultant length: \(\bar{R} = \)
+   <code>0.892</code></li>
+
+<li>mean direction: \((\bar{x}, \bar{y})/\bar{R} = \)
+(<code>0.356</code>,
+<code>0.934</code>)</li>
+
+<li>\(\tilde{\theta} = \)
+   <code>0.364</code></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgheadline31" class="outline-3">
+<h3 id="orgheadline31">Plot</h3>
+<div class="outline-text-3" id="text-orgheadline31">
+
+<div class="figure">
+<p><img src="Plots/meanDirection.png" alt="meanDirection.png" />
+</p>
+<p><span class="figure-number">Figure 12:</span> First three observations from the wind directions data and their sample mean direction.</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline35" class="outline-2">
+<h2 id="orgheadline35"><span class="section-number-2">4</span> Aside: Generating from the Uniform Distribution on the Sphere</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-orgheadline33" class="outline-3">
+<h3 id="orgheadline33">Generating Random Points on the Sphere</h3>
+<div class="outline-text-3" id="text-orgheadline33">
+<ul class="org-ul">
+<li>Wish to generate a random &ldquo;direction&rdquo; in d-dimensions; i.e., an
+observation from the uniform distribution in the \(d-1\) sphere.</li>
+<li>Usual way: let X &sim; N<sub>d</sub>(0, I) and return U = X/||X||.</li>
+<li>An alternative rejection sampler:
+<ul class="org-ul">
+<li>Repeat until ||X|| &lt;= 1
+<ul class="org-ul">
+<li>Let X be uniformly distributed on the cube [-1,1]<sup>d</sup></li>
+</ul></li>
+<li>Return U = X/||X||</li>
+</ul></li>
+<li>What is the acceptance rate for the rejection sampler:
+<ul class="org-ul">
+<li>Volume of the \(d - 1\) sphere is \(\pi^{d/2}/\Gamma(d/2 + 1)\)</li>
+<li>Volume of [-1,1]<sup>d</sup> is 2<sup>d</sup></li>
+<li>Acceptance rate is \[\frac{(\pi^{1/2}/2)^d}{\Gamma(d/2 + 1)}\]</li>
+</ul></li>
+</ul>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<tbody>
+<tr>
+<td>dimension</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+</tr>
+
+<tr>
+<td>accept rate (%)</td>
+<td>79</td>
+<td>52</td>
+<td>31</td>
+<td>16</td>
+<td>8</td>
+<td>4</td>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="outline-container-orgheadline34" class="outline-3">
+<h3 id="orgheadline34">Code for Timing Results</h3>
+<div class="outline-text-3" id="text-orgheadline34">
+<div class="org-src-container">
+
+<pre class="src src-R" id="orgsrcblock4"><span style="color: #0000ff;">runifSphere</span> <span style="color: #008b8b;">&lt;-</span> <span style="color: #a020f0;">function</span>(n, dimension, method=c(<span style="color: #8b2252;">"norm"</span>, <span style="color: #8b2252;">"cube"</span>, <span style="color: #8b2252;">"slownorm"</span>)) {
+    method <span style="color: #008b8b;">&lt;-</span> match.arg(method)
+    <span style="color: #a020f0;">if</span> (method==<span style="color: #8b2252;">"norm"</span>) {
+        u <span style="color: #008b8b;">&lt;-</span> matrix(rnorm(n*dimension), ncol=dimension)
+        u <span style="color: #008b8b;">&lt;-</span> sweep(u, 1, sqrt(apply(u*u, 1, sum)), <span style="color: #8b2252;">"/"</span>)
+    } <span style="color: #a020f0;">else</span> <span style="color: #a020f0;">if</span> (method==<span style="color: #8b2252;">"slownorm"</span>) {
+        u <span style="color: #008b8b;">&lt;-</span> matrix(nrow=n, ncol=dimension)
+        <span style="color: #a020f0;">for</span> (i <span style="color: #a020f0;">in</span> 1:n) {
+            x <span style="color: #008b8b;">&lt;-</span> rnorm(dimension)
+            xnorm <span style="color: #008b8b;">&lt;-</span> sqrt(sum(x^2))
+            u[i,] <span style="color: #008b8b;">&lt;-</span> x/xnorm
+        }
+    } <span style="color: #a020f0;">else</span> {
+        u <span style="color: #008b8b;">&lt;-</span> matrix(nrow=n, ncol=dimension)
+        <span style="color: #a020f0;">for</span> (i <span style="color: #a020f0;">in</span> 1:n) {
+            x <span style="color: #008b8b;">&lt;-</span> runif(dimension, -1, 1)
+            xnorm <span style="color: #008b8b;">&lt;-</span> sqrt(sum(x^2))
+            <span style="color: #a020f0;">while</span> (xnorm &gt; 1) {
+                x <span style="color: #008b8b;">&lt;-</span> runif(dimension, -1, 1)
+                xnorm <span style="color: #008b8b;">&lt;-</span> sqrt(sum(x^2))
+            }
+            u[i,] <span style="color: #008b8b;">&lt;-</span> x/xnorm
+        }
+    }
+    u
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 2015-09-14</p>
+<p class="author">Author: Brett Presnell</p>
+<p class="date">Created: 2015-09-14 Mon 17:43</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

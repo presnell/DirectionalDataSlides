@@ -1,0 +1,256 @@
+<h1>Introduction</h1>
+<h2>Examples</h2>
+<p>Wish to analyze data in which response is a &quot;direction&quot;:</p>
+<ul>
+<li>2d directional data are called <em>circular</em> data</li>
+<li>3d directional data are called <em>spherical</em> data</li>
+<li>not all &quot;directional&quot; data are directions in the usual sense</li>
+<li>&quot;directional&quot; data may also arise in higher dimensions</li>
+</ul>
+<h2>Wind Directions</h2>
+<ul>
+<li>Recorded at Col de la Roa, Italian Alps</li>
+<li>n = 310 (first 40 listed below)</li>
+<li>Radians, clockwise from north</li>
+<li>Source: Agostinelli (CSDA 2007); also R package <code>circular</code></li>
+</ul>
+<h3>Data</h3>
+<pre><code>ascii(matrix(wind[1:40], ncol=5, byrow=TRUE), digits=2,
+      include.rownames=FALSE, include.colnames=FALSE)
+</code></pre>
+<h3>Plot</h3>
+<pre id="windDataPlot"><code>require(&quot;circular&quot;)
+par(mar=c(0,0,0,0)+0.1, oma=c(0,0,0,0)+0.1)
+plot(windc, cex=1.5, axes=FALSE,
+     bin=360, stack=TRUE, sep=0.035, shrink=1.3)
+axis.circular(at=circular(seq(0, (7/4)*pi, pi/4),
+                  template=&quot;geographics&quot;),
+              labels=c(&quot;N&quot;,&quot;NE&quot;,&quot;E&quot;,&quot;SE&quot;,&quot;S&quot;,&quot;SW&quot;,&quot;W&quot;,&quot;NW&quot;),
+              cex=1.4)
+ticks.circular(circular(seq(0, (15/8)*pi, pi/8)),
+               zero=pi/2, rotation=&quot;clock&quot;,
+               tcl=0.075)
+</code></pre>
+<h2>Arrival Times at an ICU</h2>
+<ul>
+<li>24-hour clock times (format <code>hrs.mins</code>)</li>
+<li>n = 254 (first 32 listed below)</li>
+<li>Source: Cox &amp; Lewis (1966); also Fisher (1993) and R package <code>circular</code></li>
+</ul>
+<h3>Data</h3>
+<pre><code>ascii(matrix(fisherB1[1:32], ncol=4, byrow=TRUE), digits=2,
+      include.rownames=FALSE, include.colnames=FALSE)
+</code></pre>
+<h3>Plot</h3>
+<pre id="icuDataPlot"><code>## Note that pch=17 does not work properly here.
+par(mar=c(0,0,0,0)+0.1, oma=c(0,0,0,0)+0.1)
+plot(fisherB1c, cex=1.5, axes=TRUE,
+     bin=360, stack=TRUE, sep=0.035, shrink=1.3)
+</code></pre>
+<h2>Primate Vertebrae</h2>
+<ul>
+<li>Orientation of left superior facet of last lumbar vertebra in humans, gorillas, and chimpanzees</li>
+<li>Source: Keifer (2005 UF Anthropology MA Thesis)</li>
+</ul>
+<p><img src="file:Pictures/Gray93.png" alt="as superior articulate process." /></p>
+<h2>Plot of Human Data</h2>
+<p><img src="file:Pictures/vertebraeOnSphere.png" alt="chimpanzees (red), 16 gorillas (green) and 19 humans (blue)." /></p>
+<h2>Butterfly Migrations</h2>
+<ul>
+<li>Direction of travel observed for 2649 migrating butterflies in Florida</li>
+<li>Source: Thomas J Walker, University of Florida, Dept of Entomology and Nematology</li>
+<li>Other variables:
+<ul>
+<li>site: 23 locations in Florida</li>
+<li>observer: Thomas Walker (tw) or James J. Whitesell (jw)</li>
+<li>species: cloudless sulphur (cs), gulf fritillary (gf), long-tailed skipper (lt)</li>
+<li>distance to coast (km)</li>
+<li>date and time of observation</li>
+<li>percentage of sky free of clouds</li>
+<li>quality of sunlight: (b)right, (h)aze, (o)bstructed, (p)artly obstructed</li>
+<li>presence/absence and direction (N, NE, E, SE, S, SW, W, NW) of wind</li>
+<li>temperature</li>
+</ul></li>
+</ul>
+<h2>Why is the Analysis of Directional Data Different?</h2>
+<ul>
+<li>First three observations from the wind directions data: <code class="sourceCode r" rundoc-language="R"><span class="kw">paste</span>(<span class="kw">round</span>(wind[<span class="dv">1</span>:<span class="dv">3</span>], <span class="dv">2</span>), <span class="dt">collapse=</span><span class="st">&quot;, &quot;</span>)</code></li>
+<li>The mean of these three numbers is <code class="sourceCode r" rundoc-language="R"><span class="kw">round</span>(<span class="kw">mean</span>(wind[<span class="dv">1</span>:<span class="dv">3</span>]), <span class="dv">2</span>)</code> {{{results(<code>2.47</code>)}}}</li>
+<li>What do you think?</li>
+</ul>
+<pre id="meanAnglePlot"><code>par(mar=c(0,0,0,0)+0.1, oma=c(0,0,0,0)+0.1)
+plot(windc[1:3], cex=2, lwd=1.5, axes=TRUE, ticks=TRUE, tcl=0.05)
+points(circular(mean(wind[1:3]), units=&quot;radians&quot;, template=&quot;geographics&quot;),
+       pch=8, cex=4) 
+</code></pre>
+<h1>Graphical Display of Directional Data</h1>
+<h2>Graphical Display of Circular Data (in R)</h2>
+<ul>
+<li>Have already seen simple dot plots for circular data, e.g., for the wind data:</li>
+</ul>
+<div class="sourceCode" rundoc-language="R" rundoc-exports="code" rundoc-eval="no"><pre class="sourceCode r rundoc-block"><code class="sourceCode r">&lt;<span class="er">&lt;</span>windConvert&gt;<span class="er">&gt;</span>
+<span class="er">&lt;&lt;</span>windDataPlot&gt;<span class="er">&gt;</span></code></pre></div>
+<h2>Graphical Display of Circular Data (in R) (ctd)</h2>
+<ul>
+<li>and for the ICU data:</li>
+</ul>
+<div class="sourceCode" rundoc-language="R" rundoc-exports="code" rundoc-eval="no"><pre class="sourceCode r rundoc-block"><code class="sourceCode r">&lt;<span class="er">&lt;</span>icuDataPlot&gt;<span class="er">&gt;</span></code></pre></div>
+<ul>
+<li>and one more ...</li>
+</ul>
+<h2>Graphical Display of Circular Data (in R) (ctd)</h2>
+<pre id="antsDataPlot"><code>par(mar=c(0,0,0,0)+0.1, oma=c(0,0,0,0)+0.1)
+plot(fisherB10c$set1, units=&quot;degrees&quot;, zero=pi/2,
+     rotation=&quot;clock&quot;, pch=16, cex=1.5)
+ticks.circular(circular(seq(0, (11/6)*pi, pi/6)),
+               zero=pi/2, rotation=&quot;clock&quot;, tcl=0.075)
+points(fisherB10c$set2, zero=pi/2,
+       rotation=&quot;clock&quot;, pch=16, col=&quot;darkgrey&quot;,
+       next.points=-0.1, cex=1.5)
+points(fisherB10c$set3, zero=pi/2,
+       rotation=&quot;clock&quot;, pch=1,
+       next.points=0.1, cex=1.5)
+</code></pre>
+<h2>Graphical Display of Circular Data (in R) (ctd)</h2>
+<div class="sourceCode" rundoc-language="R" rundoc-exports="code" rundoc-eval="no"><pre class="sourceCode r rundoc-block"><code class="sourceCode r">&lt;<span class="er">&lt;</span>antsDataPlot&gt;<span class="er">&gt;</span></code></pre></div>
+<h2>Circular Histograms</h2>
+<ul>
+<li><a href="https://www.google.com/search?q=R+circular+histogram">Circular histograms</a> exist (see Fisher and Mardia and Jupp) but is there a ready-made function in R?</li>
+</ul>
+<h2>Rose Diagrams</h2>
+<ul>
+<li>Invented by <a href="https://en.wikipedia.org/wiki/Florence_Nightingale">Florence Nightingale</a> (elected first female member of the Royals Statistical Society in 1859; honorary member of ASA)</li>
+<li><a href="https://github.com/jennybc/r-graph-catalog/tree/master/figures/fig05-14_nightingale-data">Nightingale's rose in R</a> (see also <a href="http://www.r-bloggers.com/going-beyond-florence-nightingales-data-diagram-did-flo-blow-it-with-wedges/">this post</a> and the <a href="http://shiny.stat.ubc.ca/r-graph-catalog/">R graph catalog</a>)</li>
+<li>Note that radii of segments are proportional to <em>square root</em> of the frequencies (counts), so that areas are proportional to frequencies. Is this the right thing to do?</li>
+<li>Rose diagrams suffer from the same problems as histograms. The impression conveyed may depend strongly on:
+<ul>
+<li>the binwidth of the cells</li>
+<li>the choice of starting point for the bins</li>
+</ul></li>
+</ul>
+<h2>Adding a Rose Diagram to the Plot of Wind Directions</h2>
+<div class="sourceCode" id="windRosePart" rundoc-language="R" rundoc-exports="code" rundoc-eval="no"><pre class="sourceCode r rundoc-block"><code class="sourceCode r"><span class="kw">rose.diag</span>(windc, <span class="dt">bins=</span><span class="dv">16</span>, <span class="dt">col=</span><span class="st">&quot;darkgrey&quot;</span>,
+          <span class="dt">cex=</span><span class="fl">1.5</span>, <span class="dt">prop=</span><span class="fl">1.35</span>, <span class="dt">add=</span><span class="ot">TRUE</span>)</code></pre></div>
+<h2>Adding a Rose Diagram to the Plot of Wind Directions</h2>
+<pre id="windRose"><code>&lt;&lt;windDataPlot&gt;&gt;
+&lt;&lt;windRosePart&gt;&gt;
+</code></pre>
+<h2>Changing the Binwidth</h2>
+<h3>Fewer/Wider Bins</h3>
+<pre id="windRoseWideBins"><code>&lt;&lt;windDataPlot&gt;&gt;
+&lt;&lt;windRoseWideBinsPart&gt;&gt;
+</code></pre>
+<h3>Narrow Bins</h3>
+<pre id="windRoseNarrowBins"><code>&lt;&lt;windDataPlot&gt;&gt;
+&lt;&lt;windRoseNarrowBinsPart&gt;&gt;
+</code></pre>
+<h2>Changing the Radii</h2>
+<ul>
+<li>I think that the default &quot;radii proportional to counts&quot; is generally best, but this is not always obvious. The scale certainly makes a big difference however.</li>
+</ul>
+<div class="sourceCode" id="windRoseLinearPart" rundoc-language="R" rundoc-exports="code" rundoc-eval="no"><pre class="sourceCode r rundoc-block"><code class="sourceCode r"><span class="kw">rose.diag</span>(windc, <span class="dt">bins=</span><span class="dv">16</span>, <span class="dt">col=</span><span class="st">&quot;darkgrey&quot;</span>,
+          <span class="dt">radii.scale=</span><span class="st">&quot;linear&quot;</span>,
+          <span class="dt">cex=</span><span class="fl">1.5</span>, <span class="dt">prop=</span><span class="fl">2.4</span>, <span class="dt">add=</span><span class="ot">TRUE</span>)</code></pre></div>
+<h2>Changing the Radii</h2>
+<pre id="windRoseLinear"><code>&lt;&lt;windDataPlot&gt;&gt;
+&lt;&lt;windRoseLinearPart&gt;&gt;
+</code></pre>
+<h2>Kernel Density Estimates</h2>
+<div class="sourceCode" id="windKdensPart" rundoc-language="R" rundoc-exports="code" rundoc-eval="no"><pre class="sourceCode r rundoc-block"><code class="sourceCode r"><span class="kw">lines</span>(<span class="kw">density.circular</span>(windc, <span class="dt">bw=</span><span class="dv">40</span>), <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">lty=</span><span class="dv">1</span>)</code></pre></div>
+<h2>Kernel Density Estimates</h2>
+<pre id="windKdens"><code>par(mar=c(0,0,0,0)+0.1, oma=c(0,0,0,0)+0.1)
+plot(windc, cex=1.5, axes=FALSE,
+     bin=360, stack=TRUE, sep=0.035, shrink=1.7)
+axis.circular(at=circular(seq(0, (7/4)*pi, pi/4),
+                  template=&quot;geographics&quot;),
+              labels=c(&quot;N&quot;,&quot;NE&quot;,&quot;E&quot;,&quot;SE&quot;,&quot;S&quot;,&quot;SW&quot;,&quot;W&quot;,&quot;NW&quot;),
+              cex=1.4)
+ticks.circular(circular(seq(0, (15/8)*pi, pi/8)),
+               ## zero=pi/2, rotation=&quot;clock&quot;,
+               tcl=0.075)
+&lt;&lt;windRosePart&gt;&gt;
+&lt;&lt;windKdensPart&gt;&gt;
+</code></pre>
+<h2>Spherical Data</h2>
+<ul>
+<li>Are there any canned routines for plotting spherical data in R?</li>
+</ul>
+<h1>Basic Summary Statistics</h1>
+<h2>Mean Direction and Mean Resultant Length</h2>
+<ul>
+<li>First three observations from the wind directions data:</li>
+</ul>
+<pre><code>theta &lt;- wind[1:3]
+x &lt;- sin(theta)
+y &lt;- cos(theta)
+ascii(cbind(theta, x, y), digits=2,
+      include.rownames=FALSE, include.colnames=TRUE)
+</code></pre>
+<ul>
+<li><p>resultant (sum of direction vectors): (<code class="sourceCode r" rundoc-language="R"><span class="kw">round</span>(xsum, <span class="dv">3</span>)</code>, <code class="sourceCode r" rundoc-language="R"><span class="kw">round</span>(ysum, <span class="dv">3</span>)</code>)</p></li>
+<li><p>mean vector: <span class="math inline">$(\bar{x}, \bar{y}) = $</span> (<code class="sourceCode r" rundoc-language="R"><span class="kw">round</span>(xbar, <span class="dv">3</span>)</code>, <code class="sourceCode r" rundoc-language="R"><span class="kw">round</span>(ybar, <span class="dv">3</span>)</code>)</p></li>
+<li><p>resultant length (Euclidean norm of resultant): R = <code class="sourceCode r" rundoc-language="R"><span class="kw">round</span>(resultantLength, <span class="dv">3</span>)</code></p></li>
+<li><p>mean resultant length: <span class="math inline">$\bar{R} = $</span> <code class="sourceCode r" rundoc-language="R"><span class="kw">round</span>(meanResultantLength, <span class="dv">3</span>)</code></p></li>
+<li><p>mean direction: <span class="math inline">$(\bar{x}, \bar{y})/\bar{R} = $</span> (<code class="sourceCode r" rundoc-language="R"><span class="kw">round</span>(meanDirection[<span class="dv">1</span>], <span class="dv">3</span>)</code>, <code class="sourceCode r" rundoc-language="R"><span class="kw">round</span>(meanDirection[<span class="dv">2</span>], <span class="dv">3</span>)</code>)</p></li>
+<li><p><span class="math inline">$\tilde{\theta} = $</span> <code class="sourceCode r" rundoc-language="R"><span class="kw">round</span>(meanDirectionRadians, <span class="dv">3</span>)</code></p></li>
+</ul>
+<h2>Plot</h2>
+<pre id="meanDirection"><code>par(mar=c(0,0,0,0)+0.1, oma=c(0,0,0,0)+0.1)
+plot(windc[1:3], cex=2, lwd=1.5, axes=TRUE, ticks=TRUE, tcl=0.05)
+points(circular(meanDirectionRadians, units=&quot;radians&quot;, template=&quot;geographics&quot;),
+       pch=8, cex=4) 
+</code></pre>
+<h1>Aside: Generating from the Uniform Distribution on the Sphere</h1>
+<h2>Generating Random Points on the Sphere</h2>
+<ul>
+<li>Wish to generate a random &quot;direction&quot; in d-dimensions; i.e., an observation from the uniform distribution in the <span class="math inline"><em>d</em> − 1</span> sphere.</li>
+<li>Usual way: let X  ∼ N<sub>d</sub>(0, I) and return U = X/||X||.</li>
+<li>An alternative rejection sampler:
+<ul>
+<li>Repeat until ||X|| &lt;= 1
+<ul>
+<li>Let X be uniformly distributed on the cube [-1,1]<sup>d</sup></li>
+</ul></li>
+<li>Return U = X/||X||</li>
+</ul></li>
+<li>What is the acceptance rate for the rejection sampler:
+<ul>
+<li>Volume of the <span class="math inline"><em>d</em> − 1</span> sphere is <span class="math inline"><em>π</em><sup><em>d</em>/2</sup>/Γ(<em>d</em>/2 + 1)</span></li>
+<li>Volume of [-1,1]<sup>d</sup> is 2<sup>d</sup></li>
+<li>Acceptance rate is <br /><span class="math display">$$\frac{(\pi^{1/2}/2)^d}{\Gamma(d/2 + 1)}$$</span><br /></li>
+</ul></li>
+</ul>
+<pre><code>accRate &lt;- function(d) ((sqrt(pi)/2)^d)/gamma(d/2 + 1)
+d &lt;- 2:10
+## ar &lt;- matrix(accRate(d), nrow=1,
+##              dimnames=list(&quot;accept rate&quot;, &quot;d&quot;=d))
+ar &lt;- rbind(&quot;dimension&quot;=d, &quot;accept rate (%)&quot;= 100*accRate(d))
+ascii(ar, digits=0, include.rownames=TRUE, include.colnames=FALSE)
+</code></pre>
+<h2>Code for Timing Results</h2>
+<div class="sourceCode" id="runifSphereR" rundoc-language="R" rundoc-exports="code"><pre class="sourceCode r rundoc-block"><code class="sourceCode r">runifSphere &lt;-<span class="st"> </span>function(n, dimension, <span class="dt">method=</span><span class="kw">c</span>(<span class="st">&quot;norm&quot;</span>, <span class="st">&quot;cube&quot;</span>, <span class="st">&quot;slownorm&quot;</span>)) {
+    method &lt;-<span class="st"> </span><span class="kw">match.arg</span>(method)
+    if (method==<span class="st">&quot;norm&quot;</span>) {
+        u &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(n*dimension), <span class="dt">ncol=</span>dimension)
+        u &lt;-<span class="st"> </span><span class="kw">sweep</span>(u, <span class="dv">1</span>, <span class="kw">sqrt</span>(<span class="kw">apply</span>(u*u, <span class="dv">1</span>, sum)), <span class="st">&quot;/&quot;</span>)
+    } else if (method==<span class="st">&quot;slownorm&quot;</span>) {
+        u &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dt">nrow=</span>n, <span class="dt">ncol=</span>dimension)
+        for (i in <span class="dv">1</span>:n) {
+            x &lt;-<span class="st"> </span><span class="kw">rnorm</span>(dimension)
+            xnorm &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">sum</span>(x^<span class="dv">2</span>))
+            u[i,] &lt;-<span class="st"> </span>x/xnorm
+        }
+    } else {
+        u &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dt">nrow=</span>n, <span class="dt">ncol=</span>dimension)
+        for (i in <span class="dv">1</span>:n) {
+            x &lt;-<span class="st"> </span><span class="kw">runif</span>(dimension, -<span class="dv">1</span>, <span class="dv">1</span>)
+            xnorm &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">sum</span>(x^<span class="dv">2</span>))
+            while (xnorm &gt;<span class="st"> </span><span class="dv">1</span>) {
+                x &lt;-<span class="st"> </span><span class="kw">runif</span>(dimension, -<span class="dv">1</span>, <span class="dv">1</span>)
+                xnorm &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">sum</span>(x^<span class="dv">2</span>))
+            }
+            u[i,] &lt;-<span class="st"> </span>x/xnorm
+        }
+    }
+    u
+}</code></pre></div>
