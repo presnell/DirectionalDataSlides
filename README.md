@@ -4,4 +4,4 @@ The source file in all cases is the emacs [org-mode](http://orgmode.org/) file. 
 
 Interestingly, it's not easy to view the html files on github.  One work around is to use htmlpreview.github.com.  Just add the url of the html file to htmlpreview.github.com/?, e.g.,
 
-[htmlpreview.github.com/?https://github.com/presnell/DirectionalDataSlides/blob/master/directionalData.html](htmlpreview.github.com/?https://github.com/presnell/DirectionalDataSlides/blob/master/directionalData.html)
+[http://htmlpreview.github.io/?https://github.com/presnell/DirectionalDataSlides/blob/master/directionalData.html]
