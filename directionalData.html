@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2015-09-14 Mon 17:43 -->
+<!-- 2015-09-29 Tue 17:48 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="viewport" content="width=device-width, initial-scale=1" />
 <title>Analysis of Directional Data</title>
@@ -166,54 +166,6 @@ for the JavaScript code in this tag.
 <body>
 <div id="content">
 <h1 class="title">Analysis of Directional Data</h1>
-<div id="table-of-contents">
-<h2>Table of Contents</h2>
-<div id="text-table-of-contents">
-<ul>
-<li><a href="#orgheadline12">1. Introduction</a>
-<ul>
-<li><a href="#orgheadline1">Examples</a></li>
-<li><a href="#orgheadline2">Wind Directions</a></li>
-<li><a href="#orgheadline5">Arrival Times at an ICU</a></li>
-<li><a href="#orgheadline8">Primate Vertebrae</a></li>
-<li><a href="#orgheadline9">Plot of Human Data</a></li>
-<li><a href="#orgheadline10">Butterfly Migrations</a></li>
-<li><a href="#orgheadline11">Why is the Analysis of Directional Data Different?</a></li>
-</ul>
-</li>
-<li><a href="#orgheadline29">2. Graphical Display of Directional Data</a>
-<ul>
-<li><a href="#orgheadline13">Graphical Display of Circular Data (in R)</a></li>
-<li><a href="#orgheadline14">Graphical Display of Circular Data (in R) (ctd)</a></li>
-<li><a href="#orgheadline15">Graphical Display of Circular Data (in R) (ctd)</a></li>
-<li><a href="#orgheadline16">Graphical Display of Circular Data (in R) (ctd)</a></li>
-<li><a href="#orgheadline17">Circular Histograms</a></li>
-<li><a href="#orgheadline18">Rose Diagrams</a></li>
-<li><a href="#orgheadline19">Adding a Rose Diagram to the Plot of Wind Directions</a></li>
-<li><a href="#orgheadline20">Adding a Rose Diagram to the Plot of Wind Directions</a></li>
-<li><a href="#orgheadline23">Changing the Binwidth</a></li>
-<li><a href="#orgheadline24">Changing the Radii</a></li>
-<li><a href="#orgheadline25">Changing the Radii</a></li>
-<li><a href="#orgheadline26">Kernel Density Estimates</a></li>
-<li><a href="#orgheadline27">Kernel Density Estimates</a></li>
-<li><a href="#orgheadline28">Spherical Data</a></li>
-</ul>
-</li>
-<li><a href="#orgheadline32">3. Basic Summary Statistics</a>
-<ul>
-<li><a href="#orgheadline30">Mean Direction and Mean Resultant Length</a></li>
-<li><a href="#orgheadline31">Plot</a></li>
-</ul>
-</li>
-<li><a href="#orgheadline35">4. Aside: Generating from the Uniform Distribution on the Sphere</a>
-<ul>
-<li><a href="#orgheadline33">Generating Random Points on the Sphere</a></li>
-<li><a href="#orgheadline34">Code for Timing Results</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
 
 
 <div id="outline-container-orgheadline12" class="outline-2">
@@ -816,8 +768,8 @@ certainly makes a big difference however.</li>
 </div>
 </div>
 
-<div id="outline-container-orgheadline35" class="outline-2">
-<h2 id="orgheadline35"><span class="section-number-2">4</span> Aside: Generating from the Uniform Distribution on the Sphere</h2>
+<div id="outline-container-orgheadline36" class="outline-2">
+<h2 id="orgheadline36"><span class="section-number-2">4</span> Aside: Generating from the Uniform Distribution on the Sphere</h2>
 <div class="outline-text-2" id="text-4">
 </div><div id="outline-container-orgheadline33" class="outline-3">
 <h3 id="orgheadline33">Generating Random Points on the Sphere</h3>
@@ -838,7 +790,8 @@ observation from the uniform distribution in the \(d-1\) sphere.</li>
 <ul class="org-ul">
 <li>Volume of the \(d - 1\) sphere is \(\pi^{d/2}/\Gamma(d/2 + 1)\)</li>
 <li>Volume of [-1,1]<sup>d</sup> is 2<sup>d</sup></li>
-<li>Acceptance rate is \[\frac{(\pi^{1/2}/2)^d}{\Gamma(d/2 + 1)}\]</li>
+<li>Acceptance rate is \((\pi^{1/2}/2)^d/\Gamma(d/2 + 1)\)</li>
+<li>Curse of dimensionality</li>
 </ul></li>
 </ul>
 
@@ -932,12 +885,75 @@ observation from the uniform distribution in the \(d-1\) sphere.</li>
 </div>
 </div>
 </div>
+
+<div id="outline-container-orgheadline35" class="outline-3">
+<h3 id="orgheadline35">Easy fix for Borel&rsquo;s paradox in 3-d</h3>
+<div class="outline-text-3" id="text-orgheadline35">
+<p>
+Take longitude \(\phi \sim U(0,2\pi)\) independent of latitude \(\theta = \arcsin(2U-1)\), \(U \sim U(0,1)\).
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline41" class="outline-2">
+<h2 id="orgheadline41"><span class="section-number-2">5</span> Rotationally Symmetric Distributions</h2>
+<div class="outline-text-2" id="text-5">
+</div><div id="outline-container-orgheadline37" class="outline-3">
+<h3 id="orgheadline37">Comparison of Projected Normal and Langevin Distributions</h3>
+<div class="outline-text-3" id="text-orgheadline37">
+<p>
+One way that we might compare the \(\nlangevin(\mu, \kappa)\) and
+\(\npn(\gamma\mu, I)\) distributions by choosing &kappa; and &gamma; to
+give the same mean resultant lengths and comparing the densities of
+the cosine of the angle &theta; between \(U\) and \(\mu\).
+</p>
+
+<p>
+Of course matching mean resultant lengths is not necessarily the best
+way to compare these families of distributions.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgheadline38" class="outline-3">
+<h3 id="orgheadline38">\(d = 2\)</h3>
+<div class="outline-text-3" id="text-orgheadline38">
+
+<div class="figure">
+<p><img src="Plots/PNvLvMF2.png" alt="PNvLvMF2.png" />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline39" class="outline-3">
+<h3 id="orgheadline39">\(d = 3\)</h3>
+<div class="outline-text-3" id="text-orgheadline39">
+
+<div class="figure">
+<p><img src="Plots/PNvLvMF3.png" alt="PNvLvMF3.png" />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline40" class="outline-3">
+<h3 id="orgheadline40">\(d = 4\)</h3>
+<div class="outline-text-3" id="text-orgheadline40">
+
+<div class="figure">
+<p><img src="Plots/PNvLvMF4.png" alt="PNvLvMF4.png" />
+</p>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="date">Date: 2015-09-14</p>
 <p class="author">Author: Brett Presnell</p>
-<p class="date">Created: 2015-09-14 Mon 17:43</p>
+<p class="date">Created: 2015-09-29 Tue 17:48</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

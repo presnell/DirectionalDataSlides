@@ -341,7 +341,8 @@ Generating Random Points on the Sphere
 -   What is the acceptance rate for the rejection sampler:
     -   Volume of the $d - 1$ sphere is $\pi^{d/2}/\Gamma(d/2 + 1)$
     -   Volume of \[-1,1\]^d^ is 2^d^
-    -   Acceptance rate is $$\frac{(\pi^{1/2}/2)^d}{\Gamma(d/2 + 1)}$$
+    -   Acceptance rate is $(\pi^{1/2}/2)^d/\Gamma(d/2 + 1)$
+    -   Curse of dimensionality
 
 <!-- -->
 
@@ -383,3 +384,53 @@ runifSphere <- function(n, dimension, method=c("norm", "cube", "slownorm")) {
     u
 }
 ```
+
+Easy fix for Borel's paradox in 3-d
+-----------------------------------
+
+Take longitude $\phi \sim U(0,2\pi)$ independent of latitude
+$\theta = \arcsin(2U-1)$, $U \sim U(0,1)$.
+
+Rotationally Symmetric Distributions
+====================================
+
+Comparison of Projected Normal and Langevin Distributions
+---------------------------------------------------------
+
+One way that we might compare the $\nlangevin(\mu, \kappa)$ and
+$\npn(\gamma\mu, I)$ distributions by choosing *κ*and *γ*to give the
+same mean resultant lengths and comparing the densities of the cosine of
+the angle *θ*between $U$ and $\mu$.
+
+Of course matching mean resultant lengths is not necessarily the best
+way to compare these families of distributions.
+
+$d = 2$
+-------
+
+``` {#PNvLvMF2}
+par(mar=c(2,2,0,0)+0.1, oma=c(0,0,0,0)+0.1)
+plotPNvLvMF(2)
+```
+
+![](file:Plots/PNvLvMF2.png)
+
+$d = 3$
+-------
+
+``` {#PNvLvMF3}
+par(mar=c(2,2,0,0)+0.1, oma=c(0,0,0,0)+0.1)
+plotPNvLvMF(3)
+```
+
+![](file:Plots/PNvLvMF3.png)
+
+$d = 4$
+-------
+
+``` {#PNvLvMF4}
+par(mar=c(2,2,0,0)+0.1, oma=c(0,0,0,0)+0.1)
+plotPNvLvMF(4)
+```
+
+![](file:Plots/PNvLvMF4.png)

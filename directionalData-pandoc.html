@@ -217,7 +217,8 @@ points(circular(meanDirectionRadians, units=&quot;radians&quot;, template=&quot;
 <ul>
 <li>Volume of the <span class="math inline"><em>d</em> − 1</span> sphere is <span class="math inline"><em>π</em><sup><em>d</em>/2</sup>/Γ(<em>d</em>/2 + 1)</span></li>
 <li>Volume of [-1,1]<sup>d</sup> is 2<sup>d</sup></li>
-<li>Acceptance rate is <br /><span class="math display">$$\frac{(\pi^{1/2}/2)^d}{\Gamma(d/2 + 1)}$$</span><br /></li>
+<li>Acceptance rate is <span class="math inline">(<em>π</em><sup>1/2</sup>/2)<sup><em>d</em></sup>/Γ(<em>d</em>/2 + 1)</span></li>
+<li>Curse of dimensionality</li>
 </ul></li>
 </ul>
 <pre><code>accRate &lt;- function(d) ((sqrt(pi)/2)^d)/gamma(d/2 + 1)
@@ -254,3 +255,24 @@ ascii(ar, digits=0, include.rownames=TRUE, include.colnames=FALSE)
     }
     u
 }</code></pre></div>
+<h2>Easy fix for Borel's paradox in 3-d</h2>
+<p>Take longitude <span class="math inline"><em>ϕ</em> ∼ <em>U</em>(0, 2<em>π</em>)</span> independent of latitude <span class="math inline"><em>θ</em> = arcsin(2<em>U</em> − 1)</span>, <span class="math inline"><em>U</em> ∼ <em>U</em>(0, 1)</span>.</p>
+<h1>Rotationally Symmetric Distributions</h1>
+<h2>Comparison of Projected Normal and Langevin Distributions</h2>
+<p>One way that we might compare the <span class="math inline">$\nlangevin(\mu, \kappa)$</span> and <span class="math inline">$\npn(\gamma\mu, I)$</span> distributions by choosing <em>κ</em>and <em>γ</em>to give the same mean resultant lengths and comparing the densities of the cosine of the angle <em>θ</em>between <span class="math inline"><em>U</em></span> and <span class="math inline"><em>μ</em></span>.</p>
+<p>Of course matching mean resultant lengths is not necessarily the best way to compare these families of distributions.</p>
+<h2><span class="math inline"><em>d</em> = 2</span></h2>
+<pre id="PNvLvMF2"><code>par(mar=c(2,2,0,0)+0.1, oma=c(0,0,0,0)+0.1)
+plotPNvLvMF(2)
+</code></pre>
+<p><img src="file:Plots/PNvLvMF2.png" alt="" /></p>
+<h2><span class="math inline"><em>d</em> = 3</span></h2>
+<pre id="PNvLvMF3"><code>par(mar=c(2,2,0,0)+0.1, oma=c(0,0,0,0)+0.1)
+plotPNvLvMF(3)
+</code></pre>
+<p><img src="file:Plots/PNvLvMF3.png" alt="" /></p>
+<h2><span class="math inline"><em>d</em> = 4</span></h2>
+<pre id="PNvLvMF4"><code>par(mar=c(2,2,0,0)+0.1, oma=c(0,0,0,0)+0.1)
+plotPNvLvMF(4)
+</code></pre>
+<p><img src="file:Plots/PNvLvMF4.png" alt="" /></p>

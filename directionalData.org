@@ -3,14 +3,24 @@
 #+DATE: <2015-09-14 Mon>
 #+EMAIL: presnell@ufl.edu
 
-#+OPTIONS: toc:t h:2 num:1
+#+OPTIONS: toc:nil h:2 num:1
 #+STARTUP: beamer
+
+#+PROPERTY: header-args:R :session *R* :cache no :eval yes :noweb yes
+
+ # Not sure if this is the best way to handle this or not.  Note that
+ # ":cache yes" turns off ":eval yes", and requires manual evaluation
+ # of the code blocks.  So for calculations that we want to cache, set
+ # ":cache yes" on the SRC environment and manually evalute that
+ # environment.
+
+* LaTeX Header							   :noexport:
 
 #+LaTeX_CLASS: beamer
 #+LaTeX_CLASS_OPTIONS: [presentation]
 
- # Replace the previous two lines with the following for article style
- # export of beamer slides.
+ # Replace the previous two lines with the following three line for
+ # article style export of beamer slides.
  # 
  # #+LaTeX_CLASS: article
  # #+LaTeX_CLASS_OPTIONS: [letterpaper,11pt]
@@ -30,13 +40,9 @@
 
 #+LaTeX: \setbeamertemplate{caption}[numbered]
 
-#+PROPERTY: header-args:R :session *R* :cache no :eval yes :noweb yes
-
- # Not sure if this is the best way to handle this or not.  Note that
- # ":cache yes" turns off ":eval yes", and requires manual evaluation
- # of the code blocks.  So for calculations that we want to cache, set
- # ":cache yes" on the SRC environment and manually evalute that
- # environment.
+#+LaTeX_HEADER: \usepackage{amsmath}
+#+LaTeX_HEADER: \DeclareMathOperator{\nlangevin}{L}
+#+LaTeX_HEADER: \DeclareMathOperator{\npn}{PN}
 
 * Introduction
 
@@ -506,7 +512,8 @@ points(circular(meanDirectionRadians, units="radians", template="geographics"),
  - What is the acceptance rate for the rejection sampler:
    - Volume of the \(d - 1\) sphere is \(\pi^{d/2}/\Gamma(d/2 + 1)\)
    - Volume of [-1,1]^d is 2^d
-   - Acceptance rate is \[\frac{(\pi^{1/2}/2)^d}{\Gamma(d/2 + 1)}\]
+   - Acceptance rate is \((\pi^{1/2}/2)^d/\Gamma(d/2 + 1)\)
+   - Curse of dimensionality
 
 #+BEGIN_SRC R :results output raw :exports results
 accRate <- function(d) ((sqrt(pi)/2)^d)/gamma(d/2 + 1)
@@ -551,3 +558,152 @@ runifSphere <- function(n, dimension, method=c("norm", "cube", "slownorm")) {
     u
 }
 #+END_SRC
+
+** Easy fix for Borel's paradox in 3-d
+
+Take longitude \(\phi \sim U(0,2\pi)\) independent of latitude \(\theta = \arcsin(2U-1)\), \(U \sim U(0,1)\).
+
+* Rotationally Symmetric Distributions
+
+** Comparison of Projected Normal and Langevin Distributions
+
+One way that we might compare the \(\nlangevin(\mu, \kappa)\) and
+\(\npn(\gamma\mu, I)\) distributions by choosing \kappa and \gamma to
+give the same mean resultant lengths and comparing the densities of
+the cosine of the angle \theta between \(U\) and \(\mu\).
+
+Of course matching mean resultant lengths is not necessarily the best
+way to compare these families of distributions.
+
+#+BEGIN_SRC R :exports none
+### WARNING: This uses the kummerM function from the fAsianOptions
+### package to calculate the mean resultant length for the projected
+### normal distribution.  This fails for values of gamma greater than
+### 19 or so.  Should grab a better routine, especially since we only
+### need to calculated this for real arguments.
+
+mrlPN <- function(gamma, dimen) {
+
+    require(fAsianOptions)
+    zeta <- (gamma * gamma) / 2
+    hdp1 <- dimen/2 + 0.5
+    hdp2 <- hdp1 + 0.5
+    
+    gamma * exp(-zeta + lgamma(hdp1) - lgamma(hdp2)) *
+        Re(kummerM(zeta, hdp1, hdp2)) / sqrt(2)
+}
+
+imrlPN <- function(mrl, dimen, lower = 1e-5, upper = 18) {
+    uniroot(function(x) mrlPN(x, dimen) - mrl, c(lower, upper))$root
+}
+
+mrlLvMF <-
+    function(kappa, dimen) besselI(kappa, dimen/2) / besselI(kappa, dimen/2 - 1)
+
+imrlLvMF <- function(mrl, dimen, lower = 1e-5, upper = 700) {
+    uniroot(function(x) mrlLvMF(x, dimen) - mrl, c(lower, upper))$root
+}
+
+dPNAngle <- function(theta, gamma, dimen) {
+
+### gamma = length (norm) of eta in PN(eta, I) distribution.
+
+    ct <- cos(theta)
+    st <- sin(theta)
+
+    dnorm(gamma * st) * iternorm(gamma * ct, dimen - 1) * st^(dimen - 2) * 
+                                                                 2^(dimen/2) * (dimen - 1) * gamma(dimen/2)
+}
+
+iternorm <- function(x, k) {
+### 
+### Computes the kth iterated integral of the normal distribution
+### function.
+### 
+    k <- as.integer(k)
+    if (k < 1) stop("k must be a positive integer (k >= 1)")
+    a <- dnorm(x)
+    b <- pnorm(x)
+    c <- a + x * b
+    if (k > 1) {
+        for (i in 2:k) {
+            a <- b
+            b <- c
+            c <- (a + x * b) / i
+        }
+    }
+    c
+}
+
+dLvMFAngle <- function(theta, kappa, dimen) {
+    exp(kappa * cos(theta)) * (sin(theta))^(dimen - 2) *
+                                               (kappa^(dimen/2 - 1) /
+                                                      (besselI(kappa, dimen/2 - 1) *
+                                                       2^(dimen/2 - 1) * sqrt(pi) * gamma(dimen/2 - 0.5)))
+}
+
+plotPNvLvMF <- function(dimen, lwd=0.75) {
+
+    rho <- c(0.10,0.25,0.50,0.75,0.90,0.95)
+    theta <- seq(0, pi, length = 201)
+    
+    mulen <- sapply(rho, imrlPN, dimen = dimen)
+    kappa <- sapply(rho, imrlLvMF, dimen = dimen)
+    
+    ypn <- outer(theta, mulen, FUN = "dPNAngle", dimen = dimen)
+    yfvm <- outer(theta, kappa, FUN = "dLvMFAngle", dimen = dimen)
+
+    lty0 <- rep(c(1,2), each = length(rho))
+
+    matplot(theta, cbind(ypn, yfvm), type = "l",
+            lty = lty0, lwd = lwd, col = 1,
+            xaxt = "n", xlab = "", ylab = "")
+
+    legend("topright", legend = c("PN", "Langevin"), lty = 1:2)
+
+    axis(1, at = pi * (0:4)/4,
+         ## labels = expression(0, , pi/2, , pi))
+         labels = expression(0, pi/4, pi/2, 3*pi/4, pi))
+}
+#+END_SRC
+
+#+RESULTS:
+
+** \(d = 2\)
+
+#+NAME: PNvLvMF2
+#+HEADER: :file Plots/PNvLvMF2.png
+#+BEGIN_SRC R :exports results :results output graphics
+par(mar=c(2,2,0,0)+0.1, oma=c(0,0,0,0)+0.1)
+plotPNvLvMF(2)
+#+END_SRC
+
+#+ATTR_LaTeX: :height 0.6\textheight
+#+RESULTS: PNvLvMF2
+[[file:Plots/PNvLvMF2.png]]
+
+** \(d = 3\)
+
+#+NAME: PNvLvMF3
+#+HEADER: :file Plots/PNvLvMF3.png
+#+BEGIN_SRC R :exports results :results output graphics
+par(mar=c(2,2,0,0)+0.1, oma=c(0,0,0,0)+0.1)
+plotPNvLvMF(3)
+#+END_SRC
+
+#+ATTR_LaTeX: :height 0.6\textheight
+#+RESULTS: PNvLvMF3
+[[file:Plots/PNvLvMF3.png]]
+
+** \(d = 4\)
+
+#+NAME: PNvLvMF4
+#+HEADER: :file Plots/PNvLvMF4.png
+#+BEGIN_SRC R :exports results :results output graphics
+par(mar=c(2,2,0,0)+0.1, oma=c(0,0,0,0)+0.1)
+plotPNvLvMF(4)
+#+END_SRC
+
+#+ATTR_LaTeX: :height 0.6\textheight
+#+RESULTS: PNvLvMF4
+[[file:Plots/PNvLvMF4.png]]
