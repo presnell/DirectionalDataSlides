@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2015-09-29 Tue 17:48 -->
+<!-- 2015-11-05 Thu 14:17 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="viewport" content="width=device-width, initial-scale=1" />
 <title>Analysis of Directional Data</title>
@@ -949,11 +949,143 @@ way to compare these families of distributions.
 </div>
 </div>
 </div>
+
+<div id="outline-container-orgheadline50" class="outline-2">
+<h2 id="orgheadline50"><span class="section-number-2">6</span> Regression</h2>
+<div class="outline-text-2" id="text-6">
+</div><div id="outline-container-orgheadline42" class="outline-3">
+<h3 id="orgheadline42">Gould&rsquo;s Model</h3>
+<div class="outline-text-3" id="text-orgheadline42">
+<p>
+A.k.a., the <a href="https://commons.wikimedia.org/wiki/File:Barber-pole-01.gif">barber pole</a> model.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgheadline43" class="outline-3">
+<h3 id="orgheadline43">Gould&rsquo;s Model: Likelihood</h3>
+<div class="outline-text-3" id="text-orgheadline43">
+<p>
+Calculate the (profile) log-likelihood for Gould (1969 Biometrics)
+model for simple (single predictor) regression with an intercept.  For
+fixed &ldquo;slope&rdquo; &beta;, this function &ldquo;profiles out&rdquo; (maximizes over) the
+&ldquo;intercept&rdquo; term and optionally the concentration parameter &kappa;.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-R"><span style="color: #0000ff;">loglklhd.gould</span> <span style="color: #008b8b;">&lt;-</span> <span style="color: #a020f0;">function</span>(beta, theta, x, do.kappa=<span style="color: #228b22;">FALSE</span>) {
+    res <span style="color: #008b8b;">&lt;-</span> sapply(beta,
+                  <span style="color: #a020f0;">function</span>(b, th, x) {
+                      sqrt(sum(cos(th - b*x))^2
+                           + sum(sin(th - b*x))^2)
+                  },
+                  th=theta, x=x)
+    <span style="color: #a020f0;">if</span> (do.kappa) {
+        n <span style="color: #008b8b;">&lt;-</span> length(theta)
+        kappa <span style="color: #008b8b;">&lt;-</span> sapply(res/n, imrlLvMF, dimen=2)
+        res <span style="color: #008b8b;">&lt;-</span> n*log(constLvMF(kappa, dimen=2)) + kappa*res
+    }
+    res
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline44" class="outline-3">
+<h3 id="orgheadline44">Gould&rsquo;s Model with Equally Spaced X</h3>
+<div class="outline-text-3" id="text-orgheadline44">
+<div class="org-src-container">
+
+<pre class="src src-R" id="orgsrcblock5">alpha <span style="color: #008b8b;">&lt;-</span> 0
+beta <span style="color: #008b8b;">&lt;-</span> 1
+kappa = 2.5
+x <span style="color: #008b8b;">&lt;-</span> seq(-1, 1, length=10)
+mu <span style="color: #008b8b;">&lt;-</span> as.circular((alpha + beta*x) %% (2*pi))
+theta <span style="color: #008b8b;">&lt;-</span> as.circular(mu + rvonmises(length(mu), mu=0, kappa=kappa))
+period <span style="color: #008b8b;">&lt;-</span> 2*pi/(min(diff(sort(x)))) <span style="color: #b22222;"># </span><span style="color: #b22222;">Useful only for lattice x</span>
+nperiods <span style="color: #008b8b;">&lt;-</span> 1
+curve(loglklhd.gould(beta, theta, x, do.kappa), xname=<span style="color: #8b2252;">"beta"</span>, 
+      xlim=beta + nperiods*period*c(-1.125,1.125), n=nperiods*200,
+      xlab=expression(beta),
+      ylab=<span style="color: #8b2252;">"Log-Likelihood"</span>)
+abline(v = beta + ((-nperiods):nperiods)*period, lty=3) <span style="color: #b22222;"># </span><span style="color: #b22222;">for lattice x</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline45" class="outline-3">
+<h3 id="orgheadline45">Gould&rsquo;s Model with Equally-Spaced X: Kappa Not Profiled Out</h3>
+<div class="outline-text-3" id="text-orgheadline45">
+
+<div class="figure">
+<p><img src="Plots/gouldLatticeX1.png" alt="gouldLatticeX1.png" />
+</p>
+<p><span class="figure-number">Figure 16:</span> Gould&rsquo;s model log-likelihood with n=10 equally-spaced x&rsquo;s; &kappa; not profiled out.</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline46" class="outline-3">
+<h3 id="orgheadline46">Gould&rsquo;s Model with Equally-Spaced X: Kappa Profiled Out</h3>
+<div class="outline-text-3" id="text-orgheadline46">
+
+<div class="figure">
+<p><img src="Plots/gouldLatticeX2.png" alt="gouldLatticeX2.png" />
+</p>
+<p><span class="figure-number">Figure 17:</span> Gould&rsquo;s model log-likelihood with n=10 equally-spaced x&rsquo;s; &kappa; profiled out.</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline47" class="outline-3">
+<h3 id="orgheadline47">Gould&rsquo;s Model with Random X: Data Generation</h3>
+<div class="outline-text-3" id="text-orgheadline47">
+<div class="org-src-container">
+
+<pre class="src src-R">alpha <span style="color: #008b8b;">&lt;-</span> 0
+beta <span style="color: #008b8b;">&lt;-</span> 1
+kappa = 2.5
+x <span style="color: #008b8b;">&lt;-</span> rnorm(10)
+mu <span style="color: #008b8b;">&lt;-</span> as.circular((alpha + beta*x) %% (2*pi))
+theta <span style="color: #008b8b;">&lt;-</span> as.circular(mu + rvonmises(length(mu), mu=0, kappa=kappa))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline48" class="outline-3">
+<h3 id="orgheadline48">Gould&rsquo;s Model with Random X: Kappa Not Profiled Out</h3>
+<div class="outline-text-3" id="text-orgheadline48">
+
+<div class="figure">
+<p><img src="Plots/gouldRandomX1.png" alt="gouldRandomX1.png" />
+</p>
+<p><span class="figure-number">Figure 18:</span> Gould&rsquo;s model log-likelihood with n=10 random normal x&rsquo;s; &kappa; not profiled out.</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline49" class="outline-3">
+<h3 id="orgheadline49">Gould&rsquo;s Model with Random X: Kappa Profiled Out</h3>
+<div class="outline-text-3" id="text-orgheadline49">
+
+<div class="figure">
+<p><img src="Plots/gouldRandomX2.png" alt="gouldRandomX2.png" />
+</p>
+<p><span class="figure-number">Figure 19:</span> Gould&rsquo;s model log-likelihood with n=10 random normal x&rsquo;s; &kappa; profiled out.</p>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
 <p class="date">Date: 2015-09-14</p>
 <p class="author">Author: Brett Presnell</p>
-<p class="date">Created: 2015-09-29 Tue 17:48</p>
+<p class="date">Created: 2015-11-05 Thu 14:17</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

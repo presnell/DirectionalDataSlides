@@ -40,6 +40,8 @@ ticks.circular(circular(seq(0, (15/8)*pi, pi/8)),
                tcl=0.075)
 ```
 
+![](file:Plots/wind.png)
+
 Arrival Times at an ICU
 -----------------------
 
@@ -61,6 +63,8 @@ par(mar=c(0,0,0,0)+0.1, oma=c(0,0,0,0)+0.1)
 plot(fisherB1c, cex=1.5, axes=TRUE,
      bin=360, stack=TRUE, sep=0.035, shrink=1.3)
 ```
+
+![](file:Plots/icu.png)
 
 Primate Vertebrae
 -----------------
@@ -115,6 +119,8 @@ points(circular(mean(wind[1:3]), units="radians", template="geographics"),
        pch=8, cex=4) 
 ```
 
+![](file:Plots/meanAngle.png)
+
 Graphical Display of Directional Data
 =====================================
 
@@ -156,6 +162,8 @@ points(fisherB10c$set3, zero=pi/2,
        rotation="clock", pch=1,
        next.points=0.1, cex=1.5)
 ```
+
+![three different experimental conditions:](file:Plots/ants.png)
 
 Graphical Display of Circular Data (in R) (ctd)
 -----------------------------------------------
@@ -209,6 +217,9 @@ Adding a Rose Diagram to the Plot of Wind Directions
 <<windRosePart>>
 ```
 
+![(segment radii are proportional to square roots of
+counts).](file:Plots/windRose.png)
+
 Changing the Binwidth
 ---------------------
 
@@ -219,12 +230,16 @@ Changing the Binwidth
 <<windRoseWideBinsPart>>
 ```
 
+![](file:Plots/windRoseWide.png)
+
 ### Narrow Bins
 
 ``` {#windRoseNarrowBins}
 <<windDataPlot>>
 <<windRoseNarrowBinsPart>>
 ```
+
+![](file:Plots/windRoseNarrow.png)
 
 Changing the Radii
 ------------------
@@ -246,6 +261,9 @@ Changing the Radii
 <<windDataPlot>>
 <<windRoseLinearPart>>
 ```
+
+![(segment radii proportional to
+counts).](file:Plots/windRoseLinear.png)
 
 Kernel Density Estimates
 ------------------------
@@ -271,6 +289,8 @@ ticks.circular(circular(seq(0, (15/8)*pi, pi/8)),
 <<windRosePart>>
 <<windKdensPart>>
 ```
+
+![and kernel density estimate.](file:Plots/windKdens.png)
 
 Spherical Data
 --------------
@@ -324,6 +344,8 @@ plot(windc[1:3], cex=2, lwd=1.5, axes=TRUE, ticks=TRUE, tcl=0.05)
 points(circular(meanDirectionRadians, units="radians", template="geographics"),
        pch=8, cex=4) 
 ```
+
+![and their sample mean direction.](file:Plots/meanDirection.png)
 
 Aside: Generating from the Uniform Distribution on the Sphere
 =============================================================
@@ -434,3 +456,90 @@ plotPNvLvMF(4)
 ```
 
 ![](file:Plots/PNvLvMF4.png)
+
+Regression
+==========
+
+Gould's Model
+-------------
+
+A.k.a., the [barber
+pole](https://commons.wikimedia.org/wiki/File:Barber-pole-01.gif#)
+model.
+
+Gould's Model: Likelihood
+-------------------------
+
+Calculate the (profile) log-likelihood for Gould (1969 Biometrics) model
+for simple (single predictor) regression with an intercept. For fixed
+"slope" *β*, this function "profiles out" (maximizes over) the
+"intercept" term and optionally the concentration parameter *κ*.
+
+``` {.r .rundoc-block rundoc-language="R" rundoc-exports="code"}
+loglklhd.gould <- function(beta, theta, x, do.kappa=FALSE) {
+    res <- sapply(beta,
+                  function(b, th, x) {
+                      sqrt(sum(cos(th - b*x))^2
+                           + sum(sin(th - b*x))^2)
+                  },
+                  th=theta, x=x)
+    if (do.kappa) {
+        n <- length(theta)
+        kappa <- sapply(res/n, imrlLvMF, dimen=2)
+        res <- n*log(constLvMF(kappa, dimen=2)) + kappa*res
+    }
+    res
+}
+```
+
+Gould's Model with Equally Spaced X
+-----------------------------------
+
+``` {#gouldLatticeXPlot1}
+<<gouldLatticeXData>>
+<<gouldPlot>>
+```
+
+``` {#gouldLatticeXPlot2}
+<<gouldPlot>>
+```
+
+Gould's Model with Equally-Spaced X: Kappa Not Profiled Out
+-----------------------------------------------------------
+
+![*κ*not profiled out.](file:Plots/gouldLatticeX1.png)
+
+Gould's Model with Equally-Spaced X: Kappa Profiled Out
+-------------------------------------------------------
+
+![*κ*profiled out.](file:Plots/gouldLatticeX2.png)
+
+Gould's Model with Random X: Data Generation
+--------------------------------------------
+
+``` {.r}
+alpha <- 0
+beta <- 1
+kappa = 2.5
+x <- rnorm(10)
+mu <- as.circular((alpha + beta*x) %% (2*pi))
+theta <- as.circular(mu + rvonmises(length(mu), mu=0, kappa=kappa))
+```
+
+``` {#gouldRandomXPlot1}
+<<gouldPlot>>
+```
+
+``` {#gouldRandomXPlot2}
+<<gouldPlot>>
+```
+
+Gould's Model with Random X: Kappa Not Profiled Out
+---------------------------------------------------
+
+![*κ*not profiled out.](file:Plots/gouldRandomX1.png)
+
+Gould's Model with Random X: Kappa Profiled Out
+-----------------------------------------------
+
+![*κ*profiled out.](file:Plots/gouldRandomX2.png)

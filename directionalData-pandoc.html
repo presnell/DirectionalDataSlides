@@ -31,6 +31,7 @@ ticks.circular(circular(seq(0, (15/8)*pi, pi/8)),
                zero=pi/2, rotation=&quot;clock&quot;,
                tcl=0.075)
 </code></pre>
+<p><img src="file:Plots/wind.png" alt="" /></p>
 <h2>Arrival Times at an ICU</h2>
 <ul>
 <li>24-hour clock times (format <code>hrs.mins</code>)</li>
@@ -47,6 +48,7 @@ par(mar=c(0,0,0,0)+0.1, oma=c(0,0,0,0)+0.1)
 plot(fisherB1c, cex=1.5, axes=TRUE,
      bin=360, stack=TRUE, sep=0.035, shrink=1.3)
 </code></pre>
+<p><img src="file:Plots/icu.png" alt="" /></p>
 <h2>Primate Vertebrae</h2>
 <ul>
 <li>Orientation of left superior facet of last lumbar vertebra in humans, gorillas, and chimpanzees</li>
@@ -83,6 +85,7 @@ plot(windc[1:3], cex=2, lwd=1.5, axes=TRUE, ticks=TRUE, tcl=0.05)
 points(circular(mean(wind[1:3]), units=&quot;radians&quot;, template=&quot;geographics&quot;),
        pch=8, cex=4) 
 </code></pre>
+<p><img src="file:Plots/meanAngle.png" alt="" /></p>
 <h1>Graphical Display of Directional Data</h1>
 <h2>Graphical Display of Circular Data (in R)</h2>
 <ul>
@@ -111,6 +114,7 @@ points(fisherB10c$set3, zero=pi/2,
        rotation=&quot;clock&quot;, pch=1,
        next.points=0.1, cex=1.5)
 </code></pre>
+<p><img src="file:Plots/ants.png" alt="three different experimental conditions:" /></p>
 <h2>Graphical Display of Circular Data (in R) (ctd)</h2>
 <div class="sourceCode" rundoc-language="R" rundoc-exports="code" rundoc-eval="no"><pre class="sourceCode r rundoc-block"><code class="sourceCode r">&lt;<span class="er">&lt;</span>antsDataPlot&gt;<span class="er">&gt;</span></code></pre></div>
 <h2>Circular Histograms</h2>
@@ -135,15 +139,18 @@ points(fisherB10c$set3, zero=pi/2,
 <pre id="windRose"><code>&lt;&lt;windDataPlot&gt;&gt;
 &lt;&lt;windRosePart&gt;&gt;
 </code></pre>
+<p><img src="file:Plots/windRose.png" alt="(segment radii are proportional to square roots of counts)." /></p>
 <h2>Changing the Binwidth</h2>
 <h3>Fewer/Wider Bins</h3>
 <pre id="windRoseWideBins"><code>&lt;&lt;windDataPlot&gt;&gt;
 &lt;&lt;windRoseWideBinsPart&gt;&gt;
 </code></pre>
+<p><img src="file:Plots/windRoseWide.png" alt="" /></p>
 <h3>Narrow Bins</h3>
 <pre id="windRoseNarrowBins"><code>&lt;&lt;windDataPlot&gt;&gt;
 &lt;&lt;windRoseNarrowBinsPart&gt;&gt;
 </code></pre>
+<p><img src="file:Plots/windRoseNarrow.png" alt="" /></p>
 <h2>Changing the Radii</h2>
 <ul>
 <li>I think that the default &quot;radii proportional to counts&quot; is generally best, but this is not always obvious. The scale certainly makes a big difference however.</li>
@@ -155,6 +162,7 @@ points(fisherB10c$set3, zero=pi/2,
 <pre id="windRoseLinear"><code>&lt;&lt;windDataPlot&gt;&gt;
 &lt;&lt;windRoseLinearPart&gt;&gt;
 </code></pre>
+<p><img src="file:Plots/windRoseLinear.png" alt="(segment radii proportional to counts)." /></p>
 <h2>Kernel Density Estimates</h2>
 <div class="sourceCode" id="windKdensPart" rundoc-language="R" rundoc-exports="code" rundoc-eval="no"><pre class="sourceCode r rundoc-block"><code class="sourceCode r"><span class="kw">lines</span>(<span class="kw">density.circular</span>(windc, <span class="dt">bw=</span><span class="dv">40</span>), <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">lty=</span><span class="dv">1</span>)</code></pre></div>
 <h2>Kernel Density Estimates</h2>
@@ -171,6 +179,7 @@ ticks.circular(circular(seq(0, (15/8)*pi, pi/8)),
 &lt;&lt;windRosePart&gt;&gt;
 &lt;&lt;windKdensPart&gt;&gt;
 </code></pre>
+<p><img src="file:Plots/windKdens.png" alt="and kernel density estimate." /></p>
 <h2>Spherical Data</h2>
 <ul>
 <li>Are there any canned routines for plotting spherical data in R?</li>
@@ -200,6 +209,7 @@ plot(windc[1:3], cex=2, lwd=1.5, axes=TRUE, ticks=TRUE, tcl=0.05)
 points(circular(meanDirectionRadians, units=&quot;radians&quot;, template=&quot;geographics&quot;),
        pch=8, cex=4) 
 </code></pre>
+<p><img src="file:Plots/meanDirection.png" alt="and their sample mean direction." /></p>
 <h1>Aside: Generating from the Uniform Distribution on the Sphere</h1>
 <h2>Generating Random Points on the Sphere</h2>
 <ul>
@@ -276,3 +286,47 @@ plotPNvLvMF(3)
 plotPNvLvMF(4)
 </code></pre>
 <p><img src="file:Plots/PNvLvMF4.png" alt="" /></p>
+<h1>Regression</h1>
+<h2>Gould's Model</h2>
+<p>A.k.a., the <a href="https://commons.wikimedia.org/wiki/File:Barber-pole-01.gif#">barber pole</a> model.</p>
+<h2>Gould's Model: Likelihood</h2>
+<p>Calculate the (profile) log-likelihood for Gould (1969 Biometrics) model for simple (single predictor) regression with an intercept. For fixed &quot;slope&quot; <em>β</em>, this function &quot;profiles out&quot; (maximizes over) the &quot;intercept&quot; term and optionally the concentration parameter <em>κ</em>.</p>
+<div class="sourceCode" rundoc-language="R" rundoc-exports="code"><pre class="sourceCode r rundoc-block"><code class="sourceCode r">loglklhd.gould &lt;-<span class="st"> </span>function(beta, theta, x, <span class="dt">do.kappa=</span><span class="ot">FALSE</span>) {
+    res &lt;-<span class="st"> </span><span class="kw">sapply</span>(beta,
+                  function(b, th, x) {
+                      <span class="kw">sqrt</span>(<span class="kw">sum</span>(<span class="kw">cos</span>(th -<span class="st"> </span>b*x))^<span class="dv">2</span>
+                           +<span class="st"> </span><span class="kw">sum</span>(<span class="kw">sin</span>(th -<span class="st"> </span>b*x))^<span class="dv">2</span>)
+                  },
+                  <span class="dt">th=</span>theta, <span class="dt">x=</span>x)
+    if (do.kappa) {
+        n &lt;-<span class="st"> </span><span class="kw">length</span>(theta)
+        kappa &lt;-<span class="st"> </span><span class="kw">sapply</span>(res/n, imrlLvMF, <span class="dt">dimen=</span><span class="dv">2</span>)
+        res &lt;-<span class="st"> </span>n*<span class="kw">log</span>(<span class="kw">constLvMF</span>(kappa, <span class="dt">dimen=</span><span class="dv">2</span>)) +<span class="st"> </span>kappa*res
+    }
+    res
+}</code></pre></div>
+<h2>Gould's Model with Equally Spaced X</h2>
+<pre id="gouldLatticeXPlot1"><code>&lt;&lt;gouldLatticeXData&gt;&gt;
+&lt;&lt;gouldPlot&gt;&gt;
+</code></pre>
+<pre id="gouldLatticeXPlot2"><code>&lt;&lt;gouldPlot&gt;&gt;
+</code></pre>
+<h2>Gould's Model with Equally-Spaced X: Kappa Not Profiled Out</h2>
+<p><img src="file:Plots/gouldLatticeX1.png" alt="κnot profiled out." /></p>
+<h2>Gould's Model with Equally-Spaced X: Kappa Profiled Out</h2>
+<p><img src="file:Plots/gouldLatticeX2.png" alt="κprofiled out." /></p>
+<h2>Gould's Model with Random X: Data Generation</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">alpha &lt;-<span class="st"> </span><span class="dv">0</span>
+beta &lt;-<span class="st"> </span><span class="dv">1</span>
+kappa =<span class="st"> </span><span class="fl">2.5</span>
+x &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">10</span>)
+mu &lt;-<span class="st"> </span><span class="kw">as.circular</span>((alpha +<span class="st"> </span>beta*x) %%<span class="st"> </span>(<span class="dv">2</span>*pi))
+theta &lt;-<span class="st"> </span><span class="kw">as.circular</span>(mu +<span class="st"> </span><span class="kw">rvonmises</span>(<span class="kw">length</span>(mu), <span class="dt">mu=</span><span class="dv">0</span>, <span class="dt">kappa=</span>kappa))</code></pre></div>
+<pre id="gouldRandomXPlot1"><code>&lt;&lt;gouldPlot&gt;&gt;
+</code></pre>
+<pre id="gouldRandomXPlot2"><code>&lt;&lt;gouldPlot&gt;&gt;
+</code></pre>
+<h2>Gould's Model with Random X: Kappa Not Profiled Out</h2>
+<p><img src="file:Plots/gouldRandomX1.png" alt="κnot profiled out." /></p>
+<h2>Gould's Model with Random X: Kappa Profiled Out</h2>
+<p><img src="file:Plots/gouldRandomX2.png" alt="κprofiled out." /></p>
