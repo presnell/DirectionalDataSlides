@@ -52,6 +52,9 @@ require("circular")
 require("ascii")
 options(asciiType="org")
 datadir <- "../Data/"
+datafile <- function(filename, dir=datadir) {
+    paste(datadir, filename, sep="")
+}
 #+END_SRC
 
 ** Examples
@@ -181,8 +184,7 @@ plot(fisherB1c, cex=1.5, axes=TRUE,
    :END:
 
 #+BEGIN_SRC R :exports none :eval no
-datafile <- paste(datadir, "vertebrae-superior-facet.txt", sep="")
-vertebrae <- read.table(datafile, header=TRUE)
+vertebrae <- read.table(datafile("vertebrae-superior-facet.txt"), header=TRUE)
 vcol <- rep(c("red","green","blue"), table(vertebrae$species))
 require("sphereplot")
 rgl.sphgrid(radius=1,
@@ -220,8 +222,7 @@ rgl.close()
    - temperature
 
 #+BEGIN_SRC R :exports none
-datafile <- paste(datadir, "butterfly.txt", sep="")
-butterflies <- read.table(datafile, header=TRUE)
+butterflies <- read.table(datafile("butterfly.txt"), header=TRUE)
 #+END_SRC
 
 ** Why is the Analysis of Directional Data Different?
@@ -901,3 +902,144 @@ theta <- as.circular(mu + rvonmises(length(mu), mu=0, kappa=kappa))
 [[file:Plots/gouldRandomX2.png]]
 
 
+
+** Fisher-Lee Model: Likelihood
+
+Calculate the (profile) log-likelihood for the Fisher-Lee (1992
+Biometrics) model.  For fixed "slope" \beta, this function "profiles
+out" (maximizes over) the "intercept" term and optionally the
+concentration parameter \kappa.  Computing this with biggish matrix
+multiplies instead of using =apply()= or looping.
+
+#+BEGIN_SRC R :exports code
+loglklhdFisherLee <- function(beta, theta, X, do.kappa=FALSE) {
+    n <- length(theta)
+    nbeta <- dim(beta)[2]
+    if (dim(X)[1] != n) {
+        stop("Number of rows of X must equal length of theta.")
+    }
+    if (dim(beta)[1] != dim(X)[2]) {
+        stop("Number of rows of beta must equal number of columns of X")
+    }
+    dev <- theta - 2*atan(X %*% beta)
+    res <- sqrt(apply(cos(dev), 2, sum)^2
+                + apply(sin(dev), 2, sum)^2)
+    if (do.kappa) {
+        kappa <- sapply(res/n, imrlLvMF, dimen=2)
+        res <- n*log(constLvMF(kappa, dimen=2)) + kappa*res
+    }
+    res
+}
+#+END_SRC
+
+#+NAME: fisherLeePlot1d
+#+BEGIN_SRC R :exports none :eval no :var do.kappa=0
+X <- matrix(x, ncol=1)
+b <- matrix(b, nrow=1)
+ll <- loglklhdFisherLee(b, theta, X, do.kappa)
+plot(as.vector(b), ll, type = "l",
+     xlab=expression(beta),
+     ylab="Log-Likelihood")
+#+END_SRC
+
+** Fisher-Lee Model with Random X: Data Generation
+
+#+BEGIN_SRC R
+alpha <- 0
+beta <- 1
+kappa = 2.5
+x <- rnorm(10)
+mu <- as.circular(alpha + 2*atan(beta*x))
+theta <- as.circular(mu + rvonmises(length(mu), mu=0, kappa=kappa))
+#+END_SRC
+
+#+NAME: fisherLeeRandomXPlot1
+#+HEADER: :file Plots/fisherLeeRandomX1.png :width 480 :height 480
+#+BEGIN_SRC R :exports results :results output graphics :var do.kappa=0
+b <- seq(beta - 10, beta + 10, length = 400)
+<<fisherLeePlot1d>>
+#+END_SRC
+
+#+NAME: fisherLeeRandomXPlot2
+#+HEADER: :file Plots/fisherLeeRandomX2.png :width 480 :height 480
+#+BEGIN_SRC R :exports results :results output graphics :var do.kappa=1
+b <- seq(beta - 10, beta + 10, length = 400)
+<<fisherLeePlot1d>>
+#+END_SRC
+
+
+** FisherLee's Model with Random X: Kappa Not Profiled Out
+   :PROPERTIES:
+   :BEAMER_env: fullframe
+   :END:
+
+#+CAPTION: Fisher-Lee model log-likelihood with n=10 random normal x's;
+#+CAPTION: \kappa not profiled out.
+#+ATTR_LaTeX: :height 0.8\textheight
+#+RESULTS: fisherLeeRandomXPlot1
+[[file:Plots/fisherLeeRandomX1.png]]
+
+
+** Fisher-Lee Model with Random X: Kappa Profiled Out
+   :PROPERTIES:
+   :BEAMER_env: fullframe
+   :END:
+
+#+CAPTION: Fisher-Lee model log-likelihood with n=10 random normal x's;
+#+CAPTION: \kappa profiled out.
+#+ATTR_LaTeX: :height 0.8\textheight
+#+RESULTS: fisherLeeRandomXPlot2
+[[file:Plots/fisherLeeRandomX2.png]]
+
+
+** Blue Periwinkles
+
+#+BEGIN_SRC R
+periwinkles <- read.table(datafile("periwinkle.txt"), header=TRUE)
+#+END_SRC
+
+#+NAME: fisherLeePeriwinklePlot1
+#+HEADER: :file Plots/fisherLeePeriwinkles1.png :width 480 :height 480
+#+BEGIN_SRC R :exports results :results output graphics :var do.kappa=0
+x <- periwinkles$x
+theta <- periwinkles$theta * (pi/180)
+b <- seq(-2, 2, length=400)
+<<fisherLeePlot1d>>
+#+END_SRC
+
+#+NAME: fisherLeePeriwinklePlot2
+#+HEADER: :file Plots/fisherLeePeriwinkles2.png :width 480 :height 480
+#+BEGIN_SRC R :exports results :results output graphics :var do.kappa=1
+x <- periwinkles$x
+theta <- periwinkles$theta * (pi/180)
+b <- seq(-2, 2, length=400)
+<<fisherLeePlot1d>>
+#+END_SRC
+
+** Fisher-Lee Model Log-Likelihood for Periwinkle Data 
+   :PROPERTIES:
+   :BEAMER_env: fullframe
+   :END:
+
+#+CAPTION: Fisher-Lee model log-likelihood for periwinkle data;
+#+CAPTION: \kappa not profiled out.
+#+ATTR_LaTeX: :height 0.8\textheight
+#+RESULTS: fisherLeePeriwinklePlot1
+
+** Fisher-Lee Model Log-Likelihood for Periwinkle Data 
+   :PROPERTIES:
+   :BEAMER_env: fullframe
+   :END:
+
+#+CAPTION: Fisher-Lee model log-likelihood for periwinkle data;
+#+CAPTION: \kappa  profiled out.
+#+ATTR_LaTeX: :height 0.8\textheight
+#+RESULTS: fisherLeePeriwinklePlot2
+
+** Fisher-Lee Model with Two Predictors
+
+#+CAPTION: Fisher-Lee profile log-likelihood for a simulated data set
+#+CAPTION: with n = 10, \kappa = 1.0, \beta_1 = 0.1, and \beta_2 = 0.1.
+#+CAPTION: The global maximum is indicated by an asterisk.
+#+ATTR_LaTeX: :height 0.6\textheight
+[[file:Pictures/messy2.png]]
