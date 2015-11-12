@@ -944,11 +944,17 @@ plot(as.vector(b), ll, type = "l",
 
 ** Fisher-Lee Model with Random X: Data Generation
 
+Note that Fisher recommends centering the x values before fitting the
+model.  Here, to be certain that the model whose likelihood we plot is
+equivalent to the data generating model, we will center the x values
+before generating the responses.
+
 #+BEGIN_SRC R
 alpha <- 0
 beta <- 1
 kappa = 2.5
 x <- rnorm(10)
+x <- x - mean(x)
 mu <- as.circular(alpha + 2*atan(beta*x))
 theta <- as.circular(mu + rvonmises(length(mu), mu=0, kappa=kappa))
 #+END_SRC
@@ -998,10 +1004,29 @@ b <- seq(beta - 10, beta + 10, length = 400)
 periwinkles <- read.table(datafile("periwinkle.txt"), header=TRUE)
 #+END_SRC
 
+#+NAME: periwinklePlot
+#+HEADER: :file Plots/periwinkles.png :width 480 :height 480
+#+BEGIN_SRC R :exports results :results output graphics
+plot(periwinkles$x, periwinkles$theta, ylim = c(0, 2*360),
+     xlab = "Distance Moved", ylab = "Direction")
+points(periwinkles$x, 360 + periwinkles$theta)
+#+END_SRC
+
+** Plot of Periwinkle Data 
+   :PROPERTIES:
+   :BEAMER_env: fullframe
+   :END:
+
+#+CAPTION: Direction and distance moved by 31 small blue periwinkles.
+#+ATTR_LaTeX: :height 0.8\textheight
+#+RESULTS: periwinklePlot
+
+
 #+NAME: fisherLeePeriwinklePlot1
 #+HEADER: :file Plots/fisherLeePeriwinkles1.png :width 480 :height 480
 #+BEGIN_SRC R :exports results :results output graphics :var do.kappa=0
 x <- periwinkles$x
+x <- x - mean(x)
 theta <- periwinkles$theta * (pi/180)
 b <- seq(-2, 2, length=400)
 <<fisherLeePlot1d>>
@@ -1010,9 +1035,6 @@ b <- seq(-2, 2, length=400)
 #+NAME: fisherLeePeriwinklePlot2
 #+HEADER: :file Plots/fisherLeePeriwinkles2.png :width 480 :height 480
 #+BEGIN_SRC R :exports results :results output graphics :var do.kappa=1
-x <- periwinkles$x
-theta <- periwinkles$theta * (pi/180)
-b <- seq(-2, 2, length=400)
 <<fisherLeePlot1d>>
 #+END_SRC
 
