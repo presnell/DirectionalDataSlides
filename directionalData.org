@@ -1065,3 +1065,101 @@ b <- seq(-2, 2, length=400)
 #+CAPTION: The global maximum is indicated by an asterisk.
 #+ATTR_LaTeX: :height 0.6\textheight
 [[file:Pictures/messy2.png]]
+
+** SPML Model
+
+Proportional coefficients yield identical directional means with
+different concentrations.
+
+#+BEGIN_SRC R :exports none
+B <- array(dim=c(2,2,2,3))
+dimnames(B) <- list(c("Intercept","Slope"), c("eta1", "eta2"),
+                    mrlAtZero = c(0.85, 0.95), angle = c(90, 60, 30))
+B[,1,1,] <- c(imrlPN(0.85, 2), 0)
+B[,2,1,1] <- c(0,1)
+B[,2,1,2] <- c(cos(pi/3), sin(pi/3))
+B[,2,1,3] <- c(cos(pi/6), sin(pi/6))
+B <- aperm(B,c(2,1,3,4))
+B[,,2,] <- ( imrlPN(0.95, 2) / imrlPN(0.85, 2) ) * B[,,1,]
+#+END_SRC
+
+
+** SPML Coeficients: lines in 2-space
+   :PROPERTIES:
+   :BEAMER_env: fullframe
+   :END:
+
+#+NAME: SPMLvaryCoef1
+#+HEADER: :file Plots/SPMLvaryCoef1.png :width 480 :height 480
+#+BEGIN_SRC R :exports results :results output graphics
+x <- 2*seq(-1,1,length=101)
+eta <- apply(B,c(3,4),function(B,x)cbind(1,x)%*%B,x=x)
+dim(eta) <- c(101,2,6)
+omega <- apply(eta,3,function(x)atan2(x[,2],x[,1]))
+rho <- sqrt(apply(eta*eta,3,function(x) x[,1]+x[,2]))
+rho <- apply(rho, 2, mrlPN, dimen=2)
+line.sel <- c(1,2,3,4,5,6)
+lty <- c(1,1,2,2,3,3)
+# lty <- 1:4
+y1lim <- c(-1.1,max(eta[,1,line.sel]))
+y2lim <- range(eta[,2,line.sel])
+library(MASS)
+# eqscplot(cos(x*pi/2),sin(x*pi/2),type="l",xlim=c(-1.2,5.4),xlim=y1lim,ylim=y2lim,xlab="y1",ylab="y2")
+eqscplot(cos(x*pi/2),sin(x*pi/2),type="l",xlim=y1lim,ylim=y2lim,xlab="y1",ylab="y2")
+matlines(eta[,1,line.sel],eta[,2,line.sel],lty=lty, col=1)
+matpoints(eta[1,1,line.sel],eta[1,2,line.sel],pch=1, col=1)
+matpoints(eta[101,1,line.sel],eta[101,2,line.sel],pch=0,col=1)
+points(0,0)
+arrows(0,0,1,0,size=0.075,open=T)
+#+END_SRC
+
+#+CAPTION: Two sets of lines segments with proportional coefficients,
+#+CAPTION: for x ranging from -2 to 2.
+#+ATTR_LaTeX: :height 0.8\textheight
+#+RESULTS: SPMLvaryCoef1
+
+
+** SPML Coef: mean directions as a function of x.
+   :PROPERTIES:
+   :BEAMER_env: fullframe
+   :END:
+
+#+NAME: SPMLvaryCoef2
+#+HEADER: :file Plots/SPMLvaryCoef2.png :width 480 :height 480
+#+BEGIN_SRC R :exports results :results output graphics
+omega.lim <- c(-4,2)*pi/8
+omega.tick <- (-4:2)*pi/8
+omega.lab <- c("-p/2","","-p/4","","0","","p/4")
+matplot(x,omega[,line.sel],type="l",ylim=omega.lim,xlab="x",ylab="Mean Direction",lty=lty, col=1, axes=F)
+points(rep(x[1],length(line.sel)),omega[1,line.sel],pch=1, col=1)
+points(rep(x[101],length(line.sel)),omega[101,line.sel],pch=0,col=1)
+axis(1)
+axis(2, at=omega.tick, labels=omega.lab, font=13,srt=90)
+box()
+#+END_SRC
+
+#+CAPTION: Mean direction as a function of the covariate x.
+#+ATTR_LaTeX: :height 0.8\textheight
+#+RESULTS: SPMLvaryCoef2
+
+
+** SPML Coef: mean resultant length as a function of x.
+   :PROPERTIES:
+   :BEAMER_env: fullframe
+   :END:
+
+#+NAME: SPMLvaryCoef3
+#+HEADER: :file Plots/SPMLvaryCoef3.png :width 480 :height 480
+#+BEGIN_SRC R :exports results :results output graphics
+rho.lim <- range(rho[,line.sel])
+rho.lim <- c(0.5,1)
+matplot(x,rho[,line.sel],ylim=rho.lim,type="l",xlab="x",ylab="Mean Resultant Length",lty=lty, col=1)
+points(rep(x[1],length(line.sel)),rho[1,line.sel],pch=1,col=1)
+points(rep(x[101],length(line.sel)),rho[101,line.sel],pch=0,col=1)
+#+END_SRC
+
+#+CAPTION: Mean resultant length as a function of the covariate x.
+#+CAPTION: Top set of three curves correspond to the set of line
+#+CAPTION: segments farthest from the unit circle.
+#+ATTR_LaTeX: :height 0.8\textheight
+#+RESULTS: SPMLvaryCoef3
